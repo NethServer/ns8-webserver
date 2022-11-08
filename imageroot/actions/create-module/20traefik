@@ -27,9 +27,10 @@ import sys
 import json
 import agent
 import agent.tasks
+import secrets
 
 # Setup default values
-path = '/sftpgo'
+path = '/' + secrets.token_hex(10)
 h2hs = True
 
 # Talk with agent using file descriptor.
