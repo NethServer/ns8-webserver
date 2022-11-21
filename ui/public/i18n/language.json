@@ -79,7 +79,9 @@
     "delete_virtualhosts_confirm": "Delete virtual host <strong>{name}</strong>? All data will be deleted. This action is <strong>NOT</strong> reversible",
     "sftpgo_url": "SFTPGo WebClient",
     "sftpgo_login_tips": "The default login:password is {user}:{user}, you must change it at the first login",
-    "domain_already_used_in_traefik": "Domain name already used: {error}"
+    "domain_already_used_in_traefik": "Domain name already used: {error}",
+    "sftpgo_enabled": "SFTPGo",
+    "sftpgo_explanation_tooltips": "SFTPGo provides a user interface and a SFTP service for uploading your websites"
   },
   "settings": {
     "title": "Settings",

@@ -88,7 +88,7 @@
             <template #content>
               <div class="card-rows">
                 <div class="card-row">
-                  <cv-link
+                  <cv-link v-if="sftpgo_service && vhost.sftpgo_enabled"
                     :href="'http://' + hostname + path+'/web/client/login'"
                     target="_blank"
                     :inline="false"
@@ -171,6 +171,23 @@
             :placeholder="$t('virtualhosts.write_one_domain_per_line')"
           >
           </cv-text-area>
+          <NsToggle v-if="sftpgo_service"
+            :label="$t('virtualhosts.sftpgo_enabled')"
+            :value="sftpgo_enabled"
+            :form-item="true"
+            v-model="isSftpgoEnabled"
+            :disabled="loading.getConfiguration || loading.configureModule"
+            ref="sftpgo_enabled"
+            class="mg-bottom"
+          >
+            <template slot="tooltip">
+              <span
+                v-html="$t('virtualhosts.sftpgo_explanation_tooltips')"
+              ></span>
+            </template>
+            <template slot="text-left">{{ $t("virtualhosts.disabled") }}</template>
+            <template slot="text-right">{{ $t("virtualhosts.enabled") }}</template>
+          </NsToggle>
           <!-- ask lets encrypt -->
           <cv-toggle
             :value="letsencrypt"
@@ -355,6 +372,7 @@ export default {
       isShownCreateVhostModal: false,
       isShownDeleteVhostModal: false,
       path:"",
+      sftpgo_service: false,
       letsencrypt:"",
       http2https:"",
       indexes:"",
@@ -368,6 +386,7 @@ export default {
       TitleEditModal:"",
       MemoryLimit:"",
       PhpVersion:"",
+      isSftpgoEnabled: false,
       isHttpToHttpsEnabled:false,
       isLetsEncryptEnabled:false,
       isIndexesEnabled:false,
@@ -389,6 +408,7 @@ export default {
         getConfiguration: "",
         SaveVhost: "",
         ServerNames:"",
+        sftpgo_enabled: "",
         lets_encrypt: "",
         http2https: "",
         isIndexesEnabled: "",
@@ -403,6 +423,7 @@ export default {
         getConfiguration: "",
         SaveVhost: "",
         ServerNames:"",
+        sftpgo_enabled: "",
         lets_encrypt: "",
         http2https: "",
         isIndexesEnabled: "",
@@ -448,6 +469,7 @@ export default {
         isEdit: false,
         port: this.NextFpmPort,
         HttpToHttps: false,
+        sftpgo_enabled: false,
         LetsEncrypt: false,
         AllowUrlfOpen: false,
         Indexes: false
@@ -504,6 +526,7 @@ export default {
       this.virtualhost = config.virtualhost;
       this.NextFpmPort = config.NextFpmPort;
       this.sftp_tcp_port = config.sftp_tcp_port;
+      this.sftpgo_service = config.sftpgo_service;
       this.path = config.path
       this.hostname = config.hostname
       this.loading.getConfiguration = false;
@@ -558,6 +581,7 @@ export default {
 
     DisableVhost(vhost) {
       this.ServerNames = vhost.ServerNames.join('\n');
+      this.isSftpgoEnabled= vhost.sftpgo_enabled;
       this.isHttpToHttpsEnabled= vhost.http2https;
       this.isAllowUrlfOpenEnabled= (vhost.allowurlfopen === "enabled") ? true : false;
       this.isIndexesEnabled= (vhost.Indexes === "enabled") ? true : false;
@@ -581,6 +605,7 @@ export default {
       });
       this.TitleEditModal = vhost.ServerNames[0];
       this.ServerNames = vhost.ServerNames.join('\n');
+      this.isSftpgoEnabled= vhost.sftpgo_enabled;
       this.isHttpToHttpsEnabled= vhost.http2https;
       this.isAllowUrlfOpenEnabled= (vhost.allowurlfopen === "enabled") ? true : false;
       this.isIndexesEnabled= (vhost.Indexes === "enabled") ? true : false;
@@ -608,6 +633,7 @@ export default {
       });
       this.currentVhost = this.initvhost();
       this.ServerNames = this.currentVhost.ServerNames;
+      this.isSftpgoEnabled= this.currentVhost.sftpgo_enabled;
       this.isHttpToHttpsEnabled= this.currentVhost.HttpToHttps;
       this.isAllowUrlfOpenEnabled= this.currentVhost.AllowUrlfOpen;
       this.isIndexesEnabled= this.currentVhost.Indexes;
@@ -696,6 +722,7 @@ export default {
           data: {
             ...(this.isEdit) && {Port: this.Port},
             ServerNames: this.ServerNames.split('\n'),
+            sftpgo_enabled: this.isSftpgoEnabled ? true : false,
             lets_encrypt: this.isLetsEncryptEnabled ? true : false,
             http2https: this.isHttpToHttpsEnabled ? true: false,
             Indexes: this.isIndexesEnabled ? "enabled" : "disabled",
