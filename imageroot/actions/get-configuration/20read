@@ -47,6 +47,7 @@ for file in glob.iglob("databases/vhosts/*.ini"):
         "Indexes" : config['vhost']['Indexes'],
         "status" : config['vhost']['status'],
         "name": str(config['vhost']['port']),
+        "sftpgo_enabled": True if config['vhost']['sftpgo_enabled'] == "enabled" else False,
         "http2https": True if config['vhost']['http2https'] == "enabled" else False,
         "lets_encrypt": True if config['vhost']['lets_encrypt'] == "enabled" else False
     }

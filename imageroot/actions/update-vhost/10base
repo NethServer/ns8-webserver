@@ -23,6 +23,7 @@ import os
 import json
 import sys
 import subprocess
+import http.client
 
 # agent is a NethServer library which provides function to communicate with the agent
 import agent
@@ -47,6 +48,7 @@ MaxExecutionTime = data.get("MaxExecutionTime",'0')
 MaxFileUploads = data.get("MaxFileUploads",'20')
 h2hs = data.get("http2https", True)
 le = data.get("lets_encrypt", False)
+sftpgo_enabled = data.get("sftpgo_enabled", False)
 
 # Find default traefik instance for current node
 default_traefik_id = agent.resolve_agent_id('traefik@node')
@@ -87,6 +89,41 @@ config['vhost']['MaxExecutionTime'] = str(MaxExecutionTime)
 config['vhost']['MaxFileUploads'] = str(MaxFileUploads)
 config['vhost']['http2https'] = str('enabled') if h2hs else str('disabled')
 config['vhost']['lets_encrypt'] = str('enabled') if le else str('disabled')
+config['vhost']['sftpgo_enabled'] = str('enabled') if sftpgo_enabled else str('disabled')
 
 with open( 'databases/vhosts/' + str(port) +'.ini', 'w') as configfile:
     config.write(configfile)
+
+# we need to create the user in sftpgo
+
+if sftpgo_enabled:
+    f = open ('sftpgo.conf.d/API_KEY', "r")
+    api_key = f.read()
+    f.close()
+
+    # connect to sftpgo api and create the user username === port
+    conn = http.client.HTTPConnection("localhost:"+os.environ["SFTPGO_TCP_PORT"])
+
+    payload = '{"id":1,"status":1,"username":"'+str(port)+'","expiration_date":0,"password":"'+str(port)+'","home_dir":"/srv/sftpgo/data/'+str(port)+'","uid":1,"gid":'+str(port)+',"max_sessions":0,"quota_size":0,"quota_files":0,"permissions":{"/":["*"]},"created_at":0,"updated_at":0,"filters":{"tls_username":"None","hooks":{"external_auth_disabled":false,"pre_login_disabled":false,"check_password_disabled":false},"totp_config":{"secret":{}}},"filesystem":{"provider":0,"s3config":{"access_secret":{}},"gcsconfig":{"credentials":{}},"azblobconfig":{"account_key":{},"sas_url":{}},"cryptconfig":{"passphrase":{}},"sftpconfig":{"password":{},"private_key":{}}}}'
+
+    headers = {
+        'Content-Type': "application/json",
+        'X-SFTPGO-API-KEY': api_key
+        }
+
+    conn.request("POST", "/api/v2/users", payload, headers)
+else:
+    # connect to sftpgo api and delete the user username === port
+    # read api key
+    f = open ('sftpgo.conf.d/API_KEY', "r")
+    api_key = f.read()
+    f.close()
+
+    conn = http.client.HTTPConnection("localhost:"+os.environ["SFTPGO_TCP_PORT"])
+
+    headers = {
+        'Content-Type': "application/json",
+        'X-SFTPGO-API-KEY': api_key
+        }
+
+    conn.request("DELETE", "/api/v2/users/"+str(port), headers=headers)
