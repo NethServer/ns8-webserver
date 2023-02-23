@@ -63,13 +63,13 @@
         "destroy-vhost": ""
     },
     "error": {
-        "401": "",
+        "401": "Autenticazione non valida",
         "404": "Risorsa non trovata",
         "cannot_retrieve_installed_modules": "Impossibile elencare moduli installati",
-        "403": "",
+        "403": "Operazione non autorizzata",
         "network_error": "Errore di rete",
-        "generic_error": "",
-        "network_timeout": "",
+        "generic_error": "Qualcosa è andato storto",
+        "network_timeout": "Timeout di rete",
         "validation_error": "Errore di validazione",
         "error": "Errore",
         "cannot_retrieve_module_info": "Impossibile recuperare info modulo"
@@ -134,6 +134,6 @@
         "empty_state_virtualhost_description": ""
     },
     "task": {
-        "cannot_create_task": "Impossibile eseguire task [action]"
+        "cannot_create_task": "Impossibile eseguire task {action}"
     }
 }
