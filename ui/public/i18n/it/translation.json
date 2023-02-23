@@ -4,7 +4,7 @@
         "sftpgo_user_url": "",
         "open_web_client_page": "",
         "External_sftp_tcp_port": "",
-        "app_instance": "",
+        "app_instance": "Istanza app",
         "no_volumes": "Nessun volume",
         "sftpgo_admin_url": "",
         "no_services": "Nessun servizio",
@@ -17,7 +17,7 @@
         "open_web_admin_page": "",
         "sftpgo_not_running": "",
         "name": "Nome",
-        "app_images": "",
+        "app_images": "Immagine app|Immagini app",
         "default_credentials": "",
         "created": "Creato",
         "configure_sftpgo": "",
@@ -25,7 +25,7 @@
         "services": "Servizio | Servizi",
         "installation_node": "",
         "sftpgo_user_login_tips": "",
-        "app_volumes": ""
+        "app_volumes": "Volume app|Volumi app"
     },
     "settings": {
         "sftpgo_explanation_tooltips": "",
@@ -65,17 +65,17 @@
     "error": {
         "401": "",
         "404": "Risorsa non trovata",
-        "cannot_retrieve_installed_modules": "",
+        "cannot_retrieve_installed_modules": "Impossibile elencare moduli installati",
         "403": "",
         "network_error": "Errore di rete",
         "generic_error": "",
         "network_timeout": "",
         "validation_error": "Errore di validazione",
         "error": "Errore",
-        "cannot_retrieve_module_info": ""
+        "cannot_retrieve_module_info": "Impossibile recuperare info modulo"
     },
     "about": {
-        "title": ""
+        "title": "Informazioni"
     },
     "common": {
         "disabled": "",
@@ -134,6 +134,6 @@
         "empty_state_virtualhost_description": ""
     },
     "task": {
-        "cannot_create_task": ""
+        "cannot_create_task": "Impossibile eseguire task [action]"
     }
 }
