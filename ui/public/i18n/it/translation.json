@@ -11,7 +11,7 @@
         "title": "Stato",
         "sftp_tcp_port_tips": "",
         "no_images": "Nessuna immagine",
-        "mount": "",
+        "mount": "Percorso di mount",
         "sftpgo_admin_login_tips": "",
         "size": "Dimensione",
         "open_web_admin_page": "",
@@ -23,7 +23,7 @@
         "configure_sftpgo": "",
         "sftpgo_upload_website": "",
         "services": "Servizio | Servizi",
-        "installation_node": "",
+        "installation_node": "Nodo",
         "sftpgo_user_login_tips": "",
         "app_volumes": "Volume app|Volumi app"
     },
@@ -52,14 +52,14 @@
         "disabled": ""
     },
     "action": {
-        "get-module-info": "",
-        "list-backup-repositories": "",
-        "list-backups": "",
-        "list-installed-modules": "",
-        "get-name": "",
-        "get-configuration": "",
+        "get-module-info": "Visualizza info modulo",
+        "list-backup-repositories": "Elenca repository di backup",
+        "list-backups": "Elenca backup",
+        "list-installed-modules": "Elenca moduli installati",
+        "get-name": "Visualizza nome",
+        "get-configuration": "Visualizza configurazione",
         "configure-module": "Configura modulo",
-        "get-status": "",
+        "get-status": "Visualizza stato",
         "destroy-vhost": ""
     },
     "error": {
@@ -79,8 +79,8 @@
     },
     "common": {
         "disabled": "",
-        "processing": "",
-        "work_in_progress": "",
+        "processing": "Elaborazione in corso...",
+        "work_in_progress": "In lavorazione",
         "required": "Obbligatorio",
         "enabled": ""
     },
