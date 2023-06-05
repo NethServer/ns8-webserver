@@ -1,0 +1,24 @@
+#!/usr/bin/env python3
+
+#
+# Copyright (C) 2023 Nethesis S.r.l.
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+
+import os
+import sys
+import subprocess
+import glob
+import re
+
+#
+# Find enabled service and upgrade the image of the container, restart the service
+#
+
+PhpServiceArray = glob.glob('php*-fpm-custom.d')
+for folder in PhpServiceArray:
+    ConfiguredServices = re.findall('php[0-9\.]+', folder)
+    ListConfigurations = glob.glob(folder+'/*.conf')
+    if ListConfigurations :
+        subprocess.run(["podman","pull","bitnami/php-fpm:"+ConfiguredServices[0].replace('php','')])
+        subprocess.run(["systemctl", "--user", "restart", "phpfpm@"+ConfiguredServices[0].replace('php','')+".service"])
