@@ -1,0 +1,8 @@
+[Unit]
+Description=Timer of the update of phpFpm pool
+
+[Timer]
+OnCalendar=monthly
+RandomizedDelaySec=3600
+[Install]
+WantedBy=timers.target

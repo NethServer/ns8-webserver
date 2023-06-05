@@ -1,0 +1,7 @@
+[Unit]
+Description=Timer of the update of phpFpm pool
+
+[Service]
+Type=oneshot
+ExecStart=runagent update-php-fpm
+SyslogIdentifier=%u/%N
