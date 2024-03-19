@@ -117,7 +117,7 @@
         "validation_error": "Validation error"
     },
     "common": {
-        "required": "Required",
+        "required": "Beharrezkoa",
         "eg_value": "E.g. {value}",
         "work_in_progress": "Work in progress",
         "processing": "Processing...",
@@ -125,7 +125,7 @@
         "enabled": "Enabled"
     },
     "about": {
-        "title": "About"
+        "title": "Honi buruz"
     },
     "action": {
         "list-backup-repositories": "List backup repositories",

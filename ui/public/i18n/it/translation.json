@@ -44,13 +44,13 @@
         "sftpgo_url": "Applicazione web Sftpgo",
         "sftp_tcp_port_number_gte": "La porta TCP deve essere maggiore o uguale a 1024",
         "sftp_tcp_port_invalid_type": "La porta TCP non è valida, deve essere un numero intero nell'intervallo 1024-65535",
-        "sftp_tcp_port_tips": "Questa porta è necessaria per collegare un client sftp al server sftp: sftp -P port_number user@hostname",
+        "sftp_tcp_port_tips": "Questa porta è necessaria per collegare un client sftp al server sftp: sftp -P {port} user@hostname",
         "http_to_https": "Da HTTP a HTTPS",
         "lets_encrypt": "Let's Encrypt",
         "sftpgo_login_tips": "La login:password predefinita è admin:admin, è necessario cambiarla al primo accesso",
         "sftp_tcp_port_number_lte": "La porta TCP deve essere inferiore o uguale a 65535",
         "disabled": "Disabilitato",
-        "sftpgo_path_tips": "Enter a unique HTTP path, for example '/sftpgo'"
+        "sftpgo_path_tips": "Inserisci un path HTTP unico, per esempio '/sftpgo '"
     },
     "action": {
         "get-module-info": "Visualizza info modulo",
@@ -84,7 +84,7 @@
         "work_in_progress": "In lavorazione",
         "required": "Obbligatorio",
         "enabled": "Abilitato",
-        "eg_value": "E.g. {value}"
+        "eg_value": "Es. {value}"
     },
     "virtualhosts": {
         "create_virtualhost": "Crea un host virtuale",
@@ -135,8 +135,8 @@
         "Disable_virtual_Host": "Disabilitazione dell'host virtuale",
         "empty_state_virtualhost_description": "È necessario creare un host virtuale facendo clic sul pulsante seguente",
         "PHP_82": "PHP 8.2",
-        "cannot_use_fqdn_of_server": "Domain name already used by the server FQDN: {error}",
-        "ServerNames_pattern": "Must be a valid fully qualified domain name: {error}"
+        "cannot_use_fqdn_of_server": "Nome di dominio già utilizzato come server FQDN: {error}",
+        "ServerNames_pattern": "Deve essere un nome di dominio pienamente qualificato valido: {error}"
     },
     "task": {
         "cannot_create_task": "Impossibile eseguire task {action}"
