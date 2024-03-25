@@ -300,12 +300,12 @@
                   </cv-slider>
                   <cv-slider
                     :light="true"
-                    :label="$t('virtualhosts.select_php_max_execution_time_limit')"
+                    :label="$t('virtualhosts.select_php_max_file_upload_limit')"
                     :disabled="loading.getConfiguration || loading.configureModule"
-                    :min="'0'"
-                    :max="'3600'"
-                    :value="MaxExecutionTime"
-                    v-model="MaxExecutionTime"
+                    :min="'20'"
+                    :max="'20000'"
+                    :value="MaxFileUploads"
+                    v-model="MaxFileUploads"
                     :step="'1'"
                     :step-multiplier="'1'"
                     :min-label="$t('virtualhosts.Min')"
@@ -313,12 +313,12 @@
                   </cv-slider>
                   <cv-slider
                     :light="true"
-                    :label="$t('virtualhosts.select_php_max_file_upload_limit')"
+                    :label="$t('virtualhosts.select_php_max_execution_time_limit')"
                     :disabled="loading.getConfiguration || loading.configureModule"
-                    :min="'20'"
-                    :max="'20000'"
-                    :value="MaxFileUploads"
-                    v-model="MaxFileUploads"
+                    :min="'0'"
+                    :max="'3600'"
+                    :value="MaxExecutionTime"
+                    v-model="MaxExecutionTime"
                     :step="'1'"
                     :step-multiplier="'1'"
                     :min-label="$t('virtualhosts.Min')"
@@ -370,7 +370,7 @@ export default {
       isEdit: false,
       isDisable:false,
       currentVhost: {
-        ServerNames:[],
+        ServerNames:[""],
         Port:"",
       },
       TitleEditModal:"",
