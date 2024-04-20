@@ -80,7 +80,7 @@
     },
     "common": {
         "disabled": "Disabilitato",
-        "processing": "Elaborazione in corso...",
+        "processing": "In elaborazione…",
         "work_in_progress": "In lavorazione",
         "required": "Obbligatorio",
         "enabled": "Abilitato",

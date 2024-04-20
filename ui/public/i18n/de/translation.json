@@ -11,7 +11,7 @@
         "sftpgo_login_tips": "Die Standard Zugangsdaten lauten {user}:{user}, diese müssen nach der ersten Anmeldung geändert werden",
         "PHP_80": "PHP 8.0",
         "write_one_domain_per_line": "Nur ein gültiger Domänenname pro Zeile",
-        "select_php_max_execution_time_limit": "maximale Ausführungsdauer (seconds)",
+        "select_php_max_execution_time_limit": "maximale Ausführungsdauer (in Sekunden)",
         "disable_virtualhost": "virtuellen Host deaktivieren",
         "save": "Speichern",
         "cannot_use_fqdn_of_server": "Domänenname bereits in Verwendung für FQDN: {error}",

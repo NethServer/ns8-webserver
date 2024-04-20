@@ -9,7 +9,7 @@
         "sftpgo_login_tips": "El inicio de sesión:contraseña predeterminada es {usuario}:{usuario}, debes cambiarla en el primer inicio de sesión",
         "PHP_80": "PHP 8.0",
         "write_one_domain_per_line": "Un nombre de dominio válido por línea",
-        "select_php_max_execution_time_limit": "Tiempo máximo de ejecución (segundos)",
+        "select_php_max_execution_time_limit": "Tiempo máximo de ejecución en segundos (0 es ilimitado)",
         "configure_sftpgo": "Configurar SFTPGo",
         "disable_virtualhost": "Deshabilitar el host virtual",
         "save": "Guardar",
