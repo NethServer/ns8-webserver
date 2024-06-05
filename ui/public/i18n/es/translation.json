@@ -1,6 +1,6 @@
 {
     "virtualhosts": {
-        "type_to_confirm": "Escribe <strong>{name}</strong> para confirmar la eliminación",
+        "type_to_confirm": "Escribe '{name}' para confirmar la eliminación",
         "disabled": "Deshabilitado",
         "select_php_memory_limit": "Límite de memoria de script (MB)",
         "Min": "mín",
@@ -47,7 +47,7 @@
         "PHP_none": "PHP está deshabilitado",
         "PHP_82": "PHP 8.2",
         "edit": "Editar",
-        "delete_virtualhosts_confirm": "¿Eliminar el host virtual <strong>{name}</strong>? Todos los datos serán eliminados. Esta acción <strong>NO</strong> es reversible",
+        "delete_virtualhosts_confirm": "¿Eliminar el host virtual '{name}'? Todos los datos serán eliminados. Esta acción NO es reversible",
         "instance_configuration": "Aplicando la configuración del host virtual",
         "ServerNames_pattern": "Debe ser un nombre de dominio válido y completo: {error}",
         "PHP_83": "PHP 8.3"
