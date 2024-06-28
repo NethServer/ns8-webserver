@@ -2,7 +2,7 @@
     "virtualhosts": {
         "sftpgo_url": "SFTPGo Web-Client",
         "configure_sftpgo": "SFTPGo konfigurieren",
-        "type_to_confirm": "Zur Bestätigung des Löschvorgang<strong>{name}</strong> eingeben",
+        "type_to_confirm": "Zur Bestätigung des Löschvorgang '{name}' eingeben",
         "disabled": "Deaktiviert",
         "select_php_memory_limit": "Script Speicherlimit (MB)",
         "Min": "minimal",
@@ -48,7 +48,7 @@
         "PHP_none": "PHP ist deaktiviert",
         "PHP_82": "PHP 8.2",
         "edit": "Bearbeiten",
-        "delete_virtualhosts_confirm": "Virtuellen Host <strong>{name}</strong> löschen? Alle Daten werden gelöscht. Dieser Vorgang ist <strong>NICHT</strong> umkehrbar",
+        "delete_virtualhosts_confirm": "Virtuellen Host '{name}' löschen? Alle Daten werden gelöscht. Dieser Vorgang ist NICHT umkehrbar",
         "instance_configuration": "Einstellungen des virtuellen Host anwenden",
         "PHP_83": "PHP 8.3"
     },
@@ -78,16 +78,16 @@
         "sftp_tcp_port_invalid_type": "TCP port ist fehlerhaft, muss eine Zahl zwischen 1024-65535 sein"
     },
     "error": {
-        "403": "Operation nicht genehmigt",
-        "cannot_retrieve_installed_modules": "Installierte Module können nicht abgerufen werden",
-        "401": "Ungültige Authentifizierung",
-        "cannot_retrieve_module_info": "Modul-Info kann nicht abgerufen werden",
+        "403": "Vorgang nicht autorisiert",
+        "cannot_retrieve_installed_modules": "Fehler beim Abruf installierter Module",
+        "401": "Authentifizierung fehlerhaft",
+        "cannot_retrieve_module_info": "Fehler beim Abruf der Modul-Info",
         "generic_error": "Etwas ist schief gegangen",
         "error": "Fehler",
         "network_timeout": "Netzwerk-Zeitüberschreitung",
         "404": "Ressource nicht gefunden",
         "network_error": "Netzwerk-Fehler",
-        "validation_error": "Überprüfungsfehler"
+        "validation_error": "Fehler bei der Validierung"
     },
     "status": {
         "sftpgo_not_running": "SFTPGo ist nicht konfiguriert",
@@ -106,10 +106,10 @@
         "no_services": "Keine Dienste",
         "sftpgo_admin_login_tips": "Die Standard Zugangsdaten lautend admin:admin, diese müssen nach der ersten Anmeldung geändert werden",
         "External_sftp_tcp_port": "externer SFTP TCP Port",
-        "app_instance": "App-Instanz",
-        "mount": "Einhängepunkt",
+        "app_instance": "App Instanz",
+        "mount": "Mount",
         "title": "Status",
-        "installation_node": "Installations-Knoten",
+        "installation_node": "Knoten der Installation",
         "configure_sftpgo": "SFTPGo konfigurieren",
         "node": "Knoten",
         "sftpgo_user_url": "SFTPGo Web-Client",
@@ -120,8 +120,8 @@
     "common": {
         "required": "Erforderlich",
         "eg_value": "z.B. {value}",
-        "work_in_progress": "in Arbeit",
-        "processing": "Verarbeite...",
+        "work_in_progress": "In Bearbeitung",
+        "processing": "Verarbeitung läuft...",
         "disabled": "Deaktiviert",
         "enabled": "Aktiviert"
     },
@@ -129,15 +129,15 @@
         "title": "Über"
     },
     "action": {
-        "list-backup-repositories": "Datensicherungs-Ziele auflisten",
-        "list-installed-modules": "installierte Modules auflisten",
+        "list-backup-repositories": "Backup-Speicherorte auflisten",
+        "list-installed-modules": "Installierte Module auflisten",
         "get-module-info": "Modul-Info abrufen",
-        "list-backups": "Datensicherungen auflisten",
+        "list-backups": "Backups auflisten",
         "get-status": "Status abrufen",
         "destroy-vhost": "virtueller Host wird entfernt",
         "configure-module": "Modul konfigurieren",
         "get-configuration": "Konfiguration abrufen",
-        "get-name": "Namen abrufen"
+        "get-name": "Name abrufen"
     },
     "task": {
         "cannot_create_task": "Aufgabe {action} kann nicht erstellt werden"
