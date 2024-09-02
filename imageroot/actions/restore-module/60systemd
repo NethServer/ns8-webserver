@@ -30,8 +30,9 @@ import agent
 subprocess.run(["systemctl", "--user", "enable","--now", "nginx.service"])
 subprocess.run(["systemctl", "--user", "restart", "nginx.service"])
 
-agent.run_helper("systemctl", "--user", "enable","--now", "sftpgo.service").check_returncode()
-agent.run_helper("systemctl", "--user", "restart", "sftpgo.service").check_returncode()
+# do not stop/block the restore because the static port could be seen still in use by the previous module
+agent.run_helper("systemctl", "--user", "enable","--now", "sftpgo.service")
+agent.run_helper("systemctl", "--user", "restart", "sftpgo.service")
 
 # detect if a service has configurations, hence start it
 PhpServiceArray = glob.glob('php*-fpm-custom.d')
@@ -41,4 +42,3 @@ for folder in PhpServiceArray:
     if ListConfigurations :
         subprocess.run(["download-php-fpm",ConfiguredServices[0].replace('php','')])
         subprocess.run(["systemctl", "--user", "enable","--now", "phpfpm@"+ConfiguredServices[0].replace('php','')+".service"])
-
