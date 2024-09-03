@@ -20,46 +20,28 @@
 #
 import os
 import sys
-import subprocess
 import glob
 import re
 import agent
-import socket
 
-
-def is_port_in_use(port):
-    # Check if the port is in use for IPv4
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
-        try:
-            sock.bind(('', port))
-        except socket.error:
-            return True  # Port is in use for IPv4
-
-    # Check if the port is in use for IPv6
-    with socket.socket(socket.AF_INET6, socket.SOCK_STREAM) as sock:
-        try:
-            sock.bind(('', port))
-        except socket.error:
-            return True  # Port is in use for IPv6
-
-    return False  # Port is not in use for both IPv4 and IPv6
 
 # we test if the sftp port is not in use with the previous module
 port = int(os.environ['SFTP_TCP_PORT'])
-if not is_port_in_use(port):
-    # expand configuration
-    agent.run_helper("systemctl", "--user", "enable","--now", "nginx.service").check_returncode()
-    agent.run_helper("systemctl", "--user", "restart", "nginx.service").check_returncode()
-    agent.run_helper("systemctl", "--user", "enable","--now", "sftpgo.service").check_returncode()
-    agent.run_helper("systemctl", "--user", "restart", "sftpgo.service").check_returncode()
-    # detect if a service has configurations, hence start it
-    PhpServiceArray = glob.glob('php*-fpm-custom.d')
-    for folder in PhpServiceArray:
-        ConfiguredServices = re.findall('php[0-9\.]+', folder)
-        ListConfigurations = glob.glob(folder+'/*.conf')
-        if ListConfigurations :
-            agent.run_helper("download-php-fpm",ConfiguredServices[0].replace('php','')).check_returncode()
-            agent.run_helper("systemctl", "--user", "enable","--now", "phpfpm@"+ConfiguredServices[0].replace('php','')+".service").check_returncode()
-else:
+if agent.tcp_port_in_use(port):
     # port is in use, we state to restart it later
     print(f"The TCP port {port} of STFPGo is already in use you have to restart it manually later", file=sys.stderr)
+    sys.exit(0)
+
+# expand configuration
+agent.run_helper("systemctl", "--user", "enable", "nginx.service").check_returncode()
+agent.run_helper("systemctl", "--user", "restart", "nginx.service").check_returncode()
+agent.run_helper("systemctl", "--user", "enable", "sftpgo.service").check_returncode()
+agent.run_helper("systemctl", "--user", "restart", "sftpgo.service").check_returncode()
+# detect if a service has configurations, hence start it
+PhpServiceArray = glob.glob('php*-fpm-custom.d')
+for folder in PhpServiceArray:
+    ConfiguredServices = re.findall('php[0-9\.]+', folder)
+    ListConfigurations = glob.glob(folder+'/*.conf')
+    if ListConfigurations :
+        agent.run_helper("download-php-fpm",ConfiguredServices[0].replace('php','')).check_returncode()
+        agent.run_helper("systemctl", "--user", "enable","--now", "phpfpm@"+ConfiguredServices[0].replace('php','')+".service").check_returncode()
