@@ -1,4 +1,18 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["local>NethServer/.github:ns8"]
+  "extends": ["local>NethServer/.github:ns8"],
+  "regexManagers": [
+    {
+      "fileMatch": ["imageroot/bin/download-php-fpm"],
+      "matchStrings": ["(?<=version_map[8.3]=)d+.d+.d+"],
+      "depNameTemplate": "bitnami/php-fpm",
+      "datasourceTemplate": "docker"
+    }
+  ],
+  "packageRules": [
+    {
+      "matchPackageNames": ["bitnami/php-fpm"],
+      "allowedVersions": "< 8.4.0"
+    }
+  ]
 }
