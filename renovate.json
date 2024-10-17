@@ -1,4 +1,45 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["local>NethServer/.github:ns8"]
+  "extends": ["config:base"],
+  "ignorePaths": ["**/ui/**"],
+  "regexManagers": [
+    {
+      "fileMatch": ["build-images.sh"],
+      "matchStrings": ["docker\\.io/node:(?<currentValue>[^\\s]+)"],
+      "depNameTemplate": "node",
+      "datasourceTemplate": "docker"
+    },
+    {
+      "fileMatch": ["build-images.sh"],
+      "matchStrings": ["docker\\.io/drakkan/sftpgo:(?<currentValue>[^\\s]+)"],
+      "depNameTemplate": "drakkan/sftpgo",
+      "datasourceTemplate": "docker"
+    },
+    {
+      "fileMatch": ["build-images.sh"],
+      "matchStrings": ["docker\\.io/nginx:(?<currentValue>[^\\s]+)"],
+      "depNameTemplate": "nginx",
+      "datasourceTemplate": "docker"
+    },
+    {
+      "fileMatch": ["test-module.sh"],
+      "matchStrings": [
+        "ghcr\\.io/marketsquare/robotframework-browser/rfbrowser-stable:(?<currentValue>[^\\s]+)"
+      ],
+      "depNameTemplate": "MarketSquare/robotframework-browser",
+      "datasourceTemplate": "github-releases"
+    }
+  ],
+  "packageRules": [
+    {
+      "matchPackageNames": ["node"],
+      "allowedVersions": "<= 18"
+    },
+    {
+      "matchPackageNames": [
+        "ghcr.io/marketsquare/robotframework-browser/rfbrowser-stable"
+      ],
+      "allowedVersions": "<= 10.0"
+    }
+  ]
 }
