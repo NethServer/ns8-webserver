@@ -96,6 +96,4 @@ headers = {
 conn.request("POST", "/api/v2/users", payload, headers)
 
 ## create the directory for the user with podman exec
-subprocess.run(["podman", "exec", "sftpgo", "mkdir", "/srv/sftpgo/data/"+str(NextFpmPort)])
-# change owner of the root folder to bin:9001 for example
-subprocess.run(["podman", "exec", "sftpgo", "chown", "bin:"+str(NextFpmPort), "/srv/sftpgo/data/"+str(NextFpmPort)])
+subprocess.run(["podman", "exec", "sftpgo", "install", "-d", "-m", "0755", "-o", "bin", "-g", "root", "/srv/sftpgo/data/"+str(NextFpmPort)])
