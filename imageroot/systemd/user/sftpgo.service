@@ -20,7 +20,7 @@ ExecStart=/usr/bin/podman run --conmon-pidfile %t/sftpgo.pid \
     --volume %S/state/sftpgo.conf.d/admin.json:/etc/sftpgo/admin.json:Z \
     --env SFTPGO_LOADDATA_FROM=/etc/sftpgo/admin.json \
     --env SFTPGO_HTTPD__WEB_ROOT=${TRAEFIK_PATH}\
-    --env SFTPGO_SFTPD__ENABLED_SSH_COMMANDS=rsync \
+    --env SFTPGO_SFTPD__ENABLED_SSH_COMMANDS=rsync,scp \
     --user 0:0 \
     ${SFTPGO_IMAGE}
 ExecStartPost=/usr/bin/bash -c "while [[ $(curl --request GET --url http://localhost:${SFTPGO_TCP_PORT}/healthz --header 'Accept: text/plain; charset=utf-8') != ok ]]; do sleep 3 ; done"
