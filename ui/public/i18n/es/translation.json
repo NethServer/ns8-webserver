@@ -50,7 +50,8 @@
         "delete_virtualhosts_confirm": "¿Eliminar el host virtual '{name}'? Todos los datos serán eliminados. Esta acción NO es reversible",
         "instance_configuration": "Aplicando la configuración del host virtual",
         "ServerNames_pattern": "Debe ser un nombre de dominio válido y completo: {error}",
-        "PHP_83": "PHP 8.3"
+        "PHP_83": "PHP 8.3",
+        "PHP_84": "PHP 8.4"
     },
     "status": {
         "sftpgo_not_running": "SFTPGo no está configurado",
