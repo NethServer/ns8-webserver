@@ -163,10 +163,10 @@ Send a test HTTP request to the webserver backend service:
 
 a vhost can be created by the api-cli command
 
-We use a container with nginx and another container for the php-fpm configuration (actually availlable PHP 7.4,8.0,8.1,8.2,8.3)
+We use a container with nginx and another container for the php-fpm configuration (actually availlable PHP 7.4,8.0,8.1,8.2,8.3,8.4)
 
 Launch `create-vhost`, by setting the following parameters:
-- `PhpVersion`: Set the version of php needed, can be `''(no php), 7.4,8.0,8.1,8.2,8.3`
+- `PhpVersion`: Set the version of php needed, can be `''(no php), 7.4,8.0,8.1,8.2,8.3,8.4`
 - `ServerNames`: set the domain name of the vhost, it must be an array
 - `MemoryLimit`: This sets the maximum amount of memory that a script is allowed to allocate. use `MB`
 - `AllowUrlfOpen` : This option enables the URL-aware fopen wrappers that enable accessing URL object like files. use `enabled|disabled`
@@ -223,7 +223,7 @@ The TCP port of the php-fpm port is unique, each virtualhost gets a nex tcp port
 
 Launch `update-vhost`, by setting the following parameters:
 - `port`: The tcp port of php-fpm, it is used as an ID for the virtualhost
-- `PhpVersion`: Set the version of php needed, can be `''(no php), 7.4,8.0,8.1,8.2,8.3`
+- `PhpVersion`: Set the version of php needed, can be `''(no php), 7.4,8.0,8.1,8.2,8.3,8.4`
 - `ServerNames`: set the domain name of the vhost, it must be an array
 - `MemoryLimit`: This sets the maximum amount of memory that a script is allowed to allocate. use `MB`
 - `AllowUrlfOpen` : This option enables the URL-aware fopen wrappers that enable accessing URL object like files. use `enabled|disabled`
