@@ -50,6 +50,7 @@
     "PHP_81":"PHP 8.1",
     "PHP_82":"PHP 8.2",
     "PHP_83":"PHP 8.3",
+    "PHP_84":"PHP 8.4",
     "container_version_will_be_installed":"Changing PHP version will install a new PHP container: configuration might take a while",
     "select_php_version":"Version of PHP",
     "AllowUrlfOpen":"URL-aware fopen wrappers",
