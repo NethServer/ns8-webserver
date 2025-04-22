@@ -50,7 +50,8 @@
         "edit": "Bearbeiten",
         "delete_virtualhosts_confirm": "Virtuellen Host '{name}' löschen? Alle Daten werden gelöscht. Dieser Vorgang ist NICHT umkehrbar",
         "instance_configuration": "Einstellungen des virtuellen Host anwenden",
-        "PHP_83": "PHP 8.3"
+        "PHP_83": "PHP 8.3",
+        "PHP_84": "PHP 8.4"
     },
     "settings": {
         "sftp_tcp_port": "externer sftp TCP port",

@@ -50,7 +50,8 @@
         "edit": "Edit",
         "delete_virtualhosts_confirm": "Delete virtual host <strong>{name}</strong>? All data will be deleted. This action is <strong>NOT</strong> reversible",
         "instance_configuration": "Applying virtual host settings",
-        "PHP_83": "PHP 8.3"
+        "PHP_83": "PHP 8.3",
+        "PHP_84": "PHP 8.4"
     },
     "settings": {
         "sftpgo_path_tips": "Enter a unique HTTP path, for example '/sftpgo'",

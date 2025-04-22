@@ -137,7 +137,8 @@
         "PHP_82": "PHP 8.2",
         "cannot_use_fqdn_of_server": "Nome di dominio già utilizzato come server FQDN: {error}",
         "ServerNames_pattern": "Deve essere un nome di dominio pienamente qualificato valido: {error}",
-        "PHP_83": "PHP 8.3"
+        "PHP_83": "PHP 8.3",
+        "PHP_84": "PHP 8.4"
     },
     "task": {
         "cannot_create_task": "Impossibile eseguire il task {action}"
