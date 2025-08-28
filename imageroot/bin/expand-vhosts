@@ -24,8 +24,7 @@ import os
 import glob
 import configparser
 import json
-import sys
-import subprocess
+import shutil
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
 for file in glob.iglob("conf.d/dyn-*.conf"):
@@ -87,3 +86,8 @@ for file in glob.iglob("databases/vhosts/*.ini"):
             f.write(output)
         # php-fpm expects to find its customisation file
         open("php"+str(PhpVersion)+"-fpm-custom.d/dyn-"+str(port)+".custom", "a").close
+        # copy the default configurations
+        shutil.copyfile(
+            os.path.join(os.getenv("AGENT_INSTALL_DIR"), "templates", "docker.conf"),
+            f"php{PhpVersion}-fpm-custom.d/docker.conf"
+        )
