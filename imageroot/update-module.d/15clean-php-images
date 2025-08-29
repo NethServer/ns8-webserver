@@ -7,7 +7,6 @@
 
 # We want to remove php images that are not used by any php-fpm containers.
 # We use `podman rmi` to remove images, ignoring errors if they are in use.
-# Images with dual tags will not be removed (they are in use by the php-fpm service)
 
 for img_id in $(podman images --quiet --filter=reference='ghcr.io/nethserver/php*-fpm:*'); do
     # try to remove the image, ignoring errors if it's in use
