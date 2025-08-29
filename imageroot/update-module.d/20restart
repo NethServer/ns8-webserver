@@ -34,7 +34,7 @@ agent.run_helper("systemctl", "--user", "try-restart", "sftpgo.service").check_r
 PhpServiceArray = glob.glob('php*-fpm-custom.d')
 for folder in PhpServiceArray:
     ConfiguredServices = re.findall('php[0-9\.]+', folder)
-    ListConfigurations = glob.glob(folder+'/*.conf')
+    ListConfigurations = glob.glob(folder+'/dyn-*.conf')
     if ListConfigurations :
         subprocess.run(["download-php-fpm",ConfiguredServices[0].replace('php','')])
         subprocess.run(["systemctl", "--user", "try-restart", "phpfpm@"+ConfiguredServices[0].replace('php','')+".service"])

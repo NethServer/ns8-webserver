@@ -1,0 +1,67 @@
+ARG PHP_VERSION
+ENV PHP_VERSION=$PHP_VERSION
+
+FROM $PHP_VERSION
+
+# Installation des dépendances nécessaires à la compilation
+RUN apt-get update && apt-get install -y \
+    libzip-dev \
+    libldap2-dev \
+    libtidy-dev \
+    libpng-dev \
+    libjpeg-dev \
+    libwebp-dev \
+    libfreetype6-dev \
+    libicu-dev \
+    libbz2-dev \
+    libssl-dev \
+    libargon2-dev \
+    zlib1g-dev \
+    libgmp-dev \
+    libcurl4-openssl-dev \
+    libsqlite3-dev \
+    libxml2-dev \
+    libpq-dev \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
+    && docker-php-ext-install \
+        soap \
+        sockets \
+        tidy \
+        ldap \
+        gd \
+        intl \
+        zip \
+        bcmath \
+        opcache \
+        exif \
+        pdo_mysql \
+        pdo_pgsql \
+        pgsql \
+        mysqli \
+        bz2 \
+        xml \
+    && apt-get purge -y \
+        libzip-dev \
+        libldap2-dev \
+        libtidy-dev \
+        libpng-dev \
+        libjpeg-dev \
+        libwebp-dev \
+        libfreetype6-dev \
+        libicu-dev \
+        libbz2-dev \
+        libssl-dev \
+        libargon2-dev \
+        zlib1g-dev \
+        libgmp-dev \
+        libcurl4-openssl-dev \
+        libsqlite3-dev \
+        libxml2-dev \
+        libpq-dev \
+    && apt-get autoremove -y \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/* \
+    && rm -rf /tmp/* /var/tmp/*
+
+# copie docker-php-ext-opcache.ini to  /usr/local/etc/php/conf.d/docker-php-ext-opcache.ini
+COPY docker-php-ext-opcache.ini /usr/local/etc/php/conf.d/docker-php-ext-opcache.ini
