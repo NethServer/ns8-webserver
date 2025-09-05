@@ -14,7 +14,7 @@ podman build \
     --force-rm \
     --layers \
     --tag "${repobase}/php8.4-fpm" \
-    --build-arg "PHP_VERSION=docker.io/library/php:8.4.11-fpm" \
+    --build-arg "PHP_VERSION_IMAGE=docker.io/library/php:8.4.12-fpm-trixie" \
     container
 
 images+=("${repobase}/php8.4-fpm")
@@ -23,7 +23,7 @@ podman build \
     --force-rm \
     --layers \
     --tag "${repobase}/php8.3-fpm" \
-    --build-arg "PHP_VERSION=docker.io/library/php:8.3.4-fpm" \
+    --build-arg "PHP_VERSION_IMAGE=docker.io/library/php:8.3.25-fpm-trixie" \
     container
 
 images+=("${repobase}/php8.3-fpm")
@@ -32,7 +32,7 @@ podman build \
     --force-rm \
     --layers \
     --tag "${repobase}/php8.2-fpm" \
-    --build-arg "PHP_VERSION=docker.io/library/php:8.2.29-fpm" \
+    --build-arg "PHP_VERSION_IMAGE=docker.io/library/php:8.2.29-fpm-trixie" \
     container
 
 images+=("${repobase}/php8.2-fpm")
@@ -41,7 +41,7 @@ podman build \
     --force-rm \
     --layers \
     --tag "${repobase}/php8.1-fpm" \
-    --build-arg "PHP_VERSION=docker.io/library/php:8.1.33-fpm" \
+    --build-arg "PHP_VERSION_IMAGE=docker.io/library/php:8.1.33-fpm-trixie" \
     container
 
 images+=("${repobase}/php8.1-fpm")
@@ -50,7 +50,7 @@ podman build \
     --force-rm \
     --layers \
     --tag "${repobase}/php8.0-fpm" \
-    --build-arg "PHP_VERSION=docker.io/library/php:8.0.30-fpm" \
+    --build-arg "PHP_VERSION_IMAGE=docker.io/library/php:8.0.30-fpm-bullseye" \
     container
 
 images+=("${repobase}/php8.0-fpm")
@@ -59,7 +59,7 @@ podman build \
     --force-rm \
     --layers \
     --tag "${repobase}/php7.4-fpm" \
-    --build-arg "PHP_VERSION=docker.io/library/php:7.4.33-fpm" \
+    --build-arg "PHP_VERSION_IMAGE=docker.io/library/php:7.4.33-fpm-bullseye" \
     container
 
 images+=("${repobase}/php7.4-fpm")
