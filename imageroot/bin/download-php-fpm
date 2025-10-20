@@ -9,21 +9,13 @@ set -e
 
 minor_version="${1:?We expect one argument}"
 
-declare -A version_map
+# retrieve environment IMAGE_URL, remove the registry if present and keep the tag, e.g. `1.1.1`
+image_url="${IMAGE_URL:-? We expect IMAGE_URL environment variable}"
+# remove `ghcr.io/nethserver/webserver:`
+tag="${image_url##*:}"
 
-version_map[7.4]=7.4.33
-version_map[8.0]=8.0.30
-version_map[8.1]=8.1.27
-version_map[8.2]=8.2.17
-version_map[8.3]=8.3.4
-# Check if major_version is mapped properly
-if [[ -z "${version_map[$minor_version]}" ]]; then
-    echo "PHP version $minor_version is not supported" 1>&2
-    exit 1
-fi
+# save the php tag for later use in the systemd service
+echo "IMAGE_URL_TAG=$tag" > image_url_tag.env
 
 # pull the image
-podman-pull-missing "docker.io/bitnami/php-fpm:${version_map[$minor_version]}"
-# systemd service use docker.io/bitnami/php-fpm:8.1 
-# we need to tag with major version to use it locally
-/usr/bin/podman tag  "docker.io/bitnami/php-fpm:${version_map[$minor_version]}" "docker.io/bitnami/php-fpm:${minor_version}"
+podman-pull-missing "ghcr.io/nethserver/php$minor_version-fpm:$tag"

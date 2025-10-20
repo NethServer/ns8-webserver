@@ -25,7 +25,32 @@ We use local database to store configuration, you can find it `/home/webserver1/
 - add `dyn-9001.custom` to  `/home/webserver1/.config/state/php{php version}-fpm-custom.d/` for example `/home/webserver1/.config/state/php7.4-fpm-custom.d/`
 - `vim /home/webserver1/.config/state/php7.4-fpm-custom.d/dyn-9001.custom` and write a valid php-fpm configuration
 - set the file ownership to webserver1 : `chown webserver1:webserver1 /home/webserver1/.config/state/php7.4-fpm-custom.d/dyn-9001.custom`
-  
+
+#
+# Cron in sftpgo container
+#
+
+You can use a cron inside the sftpgo container. You must be compatible with a cron format. You can do it by using this command line:
+```
+runagent -m webserver1
+crontab -e
+# this is an example to rsync the NethServer repository to the virtualhost 9001
+15 */3 * * * podman exec -ti sftpgo rsync --progress -aHS --partial --delete rsync://mirror.nethserver.org/nethserver /srv/sftpgo/data/9001/
+```
+
+```
+* * * * * command_to_execute
+- - - - -
+| | | | |
+| | | | +---- Day of the week (0 - 7, Sunday is 0 or 7)
+| | | +------ Month (1 - 12)
+| | +-------- Day of the month (1 - 31)
+| +---------- Hour (0 - 23)
++------------ Minute (0 - 59)
+```
+
+you can verify the cron by `podman exec -ti sftpgo crontab -l`
+
 ## sftpgo : push the website
 
  Sftpgo is used to upload files to the webserver, once the webserver module is installed the default password and user are admin:admin at http://foo.com/sftpgo/, think to change it
@@ -140,10 +165,10 @@ Send a test HTTP request to the webserver backend service:
 
 a vhost can be created by the api-cli command
 
-We use a container with nginx and another container for the php-fpm configuration (actually availlable PHP 7.4,8.0,8.1,8.2,8.3)
+We use a container with nginx and another container for the php-fpm configuration (actually availlable PHP 7.4,8.0,8.1,8.2,8.3,8.4)
 
 Launch `create-vhost`, by setting the following parameters:
-- `PhpVersion`: Set the version of php needed, can be `''(no php), 7.4,8.0,8.1,8.2,8.3`
+- `PhpVersion`: Set the version of php needed, can be `''(no php), 7.4,8.0,8.1,8.2,8.3,8.4`
 - `ServerNames`: set the domain name of the vhost, it must be an array
 - `MemoryLimit`: This sets the maximum amount of memory that a script is allowed to allocate. use `MB`
 - `AllowUrlfOpen` : This option enables the URL-aware fopen wrappers that enable accessing URL object like files. use `enabled|disabled`
@@ -200,7 +225,7 @@ The TCP port of the php-fpm port is unique, each virtualhost gets a nex tcp port
 
 Launch `update-vhost`, by setting the following parameters:
 - `port`: The tcp port of php-fpm, it is used as an ID for the virtualhost
-- `PhpVersion`: Set the version of php needed, can be `''(no php), 7.4,8.0,8.1,8.2,8.3`
+- `PhpVersion`: Set the version of php needed, can be `''(no php), 7.4,8.0,8.1,8.2,8.3,8.4`
 - `ServerNames`: set the domain name of the vhost, it must be an array
 - `MemoryLimit`: This sets the maximum amount of memory that a script is allowed to allocate. use `MB`
 - `AllowUrlfOpen` : This option enables the URL-aware fopen wrappers that enable accessing URL object like files. use `enabled|disabled`

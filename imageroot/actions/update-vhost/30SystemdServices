@@ -44,14 +44,15 @@ if PhpVersion:
     PhpServiceArray = glob.glob('php*-fpm-custom.d')
     for folder in PhpServiceArray:
         ConfiguredServices = re.findall('php[0-9\.]+', folder)
-        ListConfigurations = glob.glob(folder+'/*.conf')
+        ListConfigurations = glob.glob(folder+'/dyn-*.conf')
         if not ListConfigurations :
             subprocess.run(["systemctl", "--user", "disable","--now", "phpfpm@"+ConfiguredServices[0].replace('php','')+".service"])
     # pull the image if missing
     subprocess.run(["download-php-fpm",str(PhpVersion)])
     # start the container  if stopped
     subprocess.run(["systemctl", "--user", "enable", "--now", "phpfpm@"+str(PhpVersion)+".service"])
-    subprocess.run(["systemctl", "--user", "reload", "phpfpm@\*.service"])
+    # php version might have changed, reload all php-fpm services
+    subprocess.run(["systemctl", "--user", "reload", "phpfpm@*.service"])
 else:
     subprocess.run(["systemctl", "--user", "reload", "nginx.service"])
-    subprocess.run(["systemctl", "--user", "reload", "phpfpm@\*.service"])
+    subprocess.run(["systemctl", "--user", "reload", "phpfpm@*.service"])

@@ -10,6 +10,60 @@ repobase="${REPOBASE:-ghcr.io/nethserver}"
 # Configure the image name
 reponame="webserver"
 
+podman build \
+    --force-rm \
+    --layers \
+    --tag "${repobase}/php8.4-fpm" \
+    --build-arg "PHP_VERSION_IMAGE=docker.io/library/php:8.4.12-fpm-trixie" \
+    container
+
+images+=("${repobase}/php8.4-fpm")
+
+podman build \
+    --force-rm \
+    --layers \
+    --tag "${repobase}/php8.3-fpm" \
+    --build-arg "PHP_VERSION_IMAGE=docker.io/library/php:8.3.25-fpm-trixie" \
+    container
+
+images+=("${repobase}/php8.3-fpm")
+
+podman build \
+    --force-rm \
+    --layers \
+    --tag "${repobase}/php8.2-fpm" \
+    --build-arg "PHP_VERSION_IMAGE=docker.io/library/php:8.2.29-fpm-trixie" \
+    container
+
+images+=("${repobase}/php8.2-fpm")
+
+podman build \
+    --force-rm \
+    --layers \
+    --tag "${repobase}/php8.1-fpm" \
+    --build-arg "PHP_VERSION_IMAGE=docker.io/library/php:8.1.33-fpm-trixie" \
+    container
+
+images+=("${repobase}/php8.1-fpm")
+
+podman build \
+    --force-rm \
+    --layers \
+    --tag "${repobase}/php8.0-fpm" \
+    --build-arg "PHP_VERSION_IMAGE=docker.io/library/php:8.0.30-fpm-bullseye" \
+    container
+
+images+=("${repobase}/php8.0-fpm")
+
+podman build \
+    --force-rm \
+    --layers \
+    --tag "${repobase}/php7.4-fpm" \
+    --build-arg "PHP_VERSION_IMAGE=docker.io/library/php:7.4.33-fpm-bullseye" \
+    container
+
+images+=("${repobase}/php7.4-fpm")
+
 # Create a new empty container image
 container=$(buildah from scratch)
 
@@ -30,7 +84,7 @@ buildah config --entrypoint=/ \
     --label="org.nethserver.authorizations=node:fwadm traefik@node:routeadm" \
     --label="org.nethserver.tcp-ports-demand=2" \
     --label="org.nethserver.rootfull=0" \
-    --label="org.nethserver.images=docker.io/nginx:1.25.4-alpine docker.io/drakkan/sftpgo:v2.5.6-alpine" \
+    --label="org.nethserver.images=docker.io/nginx:1.28.0-alpine docker.io/drakkan/sftpgo:v2.6.6-alpine" \
     "${container}"
 # Commit the image
 buildah commit "${container}" "${repobase}/${reponame}"

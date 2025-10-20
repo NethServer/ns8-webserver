@@ -53,10 +53,12 @@ for file in glob.iglob("databases/vhosts/*.ini"):
     vhosts.append(vhost)
 
 configuration['virtualhost'] = vhosts
-# read Netxfpmport
-with open("databases/NextFpmPort", "r") as fp:
-    NextFpmPort = int(fp.read() or "9000") + 1
-fp.close()
+# read Netxfpmport, the file could be missing so we need to handle the exception
+try:
+    with open("databases/NextFpmPort", "r") as fp:
+        NextFpmPort = int(fp.read() or "9000") + 1
+except FileNotFoundError:
+    NextFpmPort = 9001
 
 configuration['NextFpmPort'] = NextFpmPort
 

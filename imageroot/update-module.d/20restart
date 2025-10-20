@@ -26,15 +26,15 @@ import re
 import agent
 
 # expand configuration
-subprocess.run(["systemctl", "--user", "try-restart", "webserver.service"])
-
-agent.run_helper("systemctl", "--user", "try-restart", "sftpgo.service").check_returncode()
+if os.environ.get('TRAEFIK_PATH'): # services are configured
+    subprocess.run(["systemctl", "--user", "restart", "webserver.service"])
+    agent.run_helper("systemctl", "--user", "restart", "sftpgo.service").check_returncode()
 
 # detect if a service has configurations, hence start it
 PhpServiceArray = glob.glob('php*-fpm-custom.d')
 for folder in PhpServiceArray:
     ConfiguredServices = re.findall('php[0-9\.]+', folder)
-    ListConfigurations = glob.glob(folder+'/*.conf')
+    ListConfigurations = glob.glob(folder+'/dyn-*.conf')
     if ListConfigurations :
         subprocess.run(["download-php-fpm",ConfiguredServices[0].replace('php','')])
-        subprocess.run(["systemctl", "--user", "try-restart", "phpfpm@"+ConfiguredServices[0].replace('php','')+".service"])
+        subprocess.run(["systemctl", "--user", "restart", "phpfpm@"+ConfiguredServices[0].replace('php','')+".service"])

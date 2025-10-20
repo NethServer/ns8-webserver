@@ -39,6 +39,8 @@ if PhpVersion:
     subprocess.run(["download-php-fpm",str(PhpVersion)])
     # start the container  if stopped
     subprocess.run(["systemctl", "--user", "enable", "--now", "phpfpm@"+str(PhpVersion)+".service"])
+    # we need to reload the php fpm service to let him know about the new configuration
+    subprocess.run(["systemctl", "--user", "reload", "phpfpm@"+str(PhpVersion)+".service"])
 else:
     subprocess.run(["systemctl", "--user", "reload", "nginx.service"])
 
