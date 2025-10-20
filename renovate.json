@@ -6,8 +6,7 @@
       "matchDatasources": ["docker"],
       "matchPackageNames": ["php"],
       "matchPackagePatterns": ["^php:.*-fpm.*$"],
-      "rangeStrategy": "pin",
-      "bumpTypes": ["patch"]
+      "rangeStrategy": "pin"
     }
   ]
 }
