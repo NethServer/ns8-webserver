@@ -5,9 +5,44 @@
     {
       "matchDatasources": ["docker"],
       "matchPackageNames": ["php"],
-      "matchPackagePatterns": ["^php:.*-fpm.*$"],
-      "rangeStrategy": "pin",
-      "bumpTypes": ["patch"]
+      "matchCurrentVersion": "/^7\\.4\\./",
+      "allowedVersions": "/^7\\.4\\./",
+      "rangeStrategy": "pin"
+    },
+    {
+      "matchDatasources": ["docker"],
+      "matchPackageNames": ["php"],
+      "matchCurrentVersion": "/^8\\.0\\./",
+      "allowedVersions": "/^8\\.0\\./",
+      "rangeStrategy": "pin"
+    },
+    {
+      "matchDatasources": ["docker"],
+      "matchPackageNames": ["php"],
+      "matchCurrentVersion": "/^8\\.1\\./",
+      "allowedVersions": "/^8\\.1\\./",
+      "rangeStrategy": "pin"
+    },
+    {
+      "matchDatasources": ["docker"],
+      "matchPackageNames": ["php"],
+      "matchCurrentVersion": "/^8\\.2\\./",
+      "allowedVersions": "/^8\\.2\\./",
+      "rangeStrategy": "pin"
+    },
+    {
+      "matchDatasources": ["docker"],
+      "matchPackageNames": ["php"],
+      "matchCurrentVersion": "/^8\\.3\\./",
+      "allowedVersions": "/^8\\.3\\./",
+      "rangeStrategy": "pin"
+    },
+    {
+      "matchDatasources": ["docker"],
+      "matchPackageNames": ["php"],
+      "matchCurrentVersion": "/^8\\.4\\./",
+      "allowedVersions": "/^8\\.4\\./",
+      "rangeStrategy": "pin"
     }
   ]
 }
