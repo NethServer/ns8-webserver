@@ -14,7 +14,7 @@ podman build \
     --force-rm \
     --layers \
     --tag "${repobase}/php8.4-fpm" \
-    --build-arg "PHP_VERSION_IMAGE=docker.io/library/php:8.4.12-fpm-trixie" \
+    --build-arg "PHP_VERSION_IMAGE=docker.io/library/php:8.4.14-fpm-trixie" \
     container
 
 images+=("${repobase}/php8.4-fpm")
@@ -23,7 +23,7 @@ podman build \
     --force-rm \
     --layers \
     --tag "${repobase}/php8.3-fpm" \
-    --build-arg "PHP_VERSION_IMAGE=docker.io/library/php:8.3.25-fpm-trixie" \
+    --build-arg "PHP_VERSION_IMAGE=docker.io/library/php:8.3.27-fpm-trixie" \
     container
 
 images+=("${repobase}/php8.3-fpm")
