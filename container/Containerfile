@@ -1,15 +1,17 @@
-# Define the PHP version via ARG
+# ==========================================================
+#  Universal PHP IMAP build for Debian Bullseye/Bookworm
+#  Works with PHP < 8.4 (built-in IMAP)
+#  Works with PHP >= 8.4 (PECL IMAP)
+#  Stops on any error
+# ==========================================================
+
 ARG PHP_VERSION_IMAGE
 FROM ${PHP_VERSION_IMAGE}
 
-# Set environment variable for PHP version image
 ARG PHP_VERSION_IMAGE
 ENV PHP_VERSION_IMAGE=${PHP_VERSION_IMAGE}
 
-# Dépendances de build (compatibles Bullseye/Trixie)
-# latest php images does not support php7.4 and php8.0
-# we could stick to bullseyes but trixie is the current stable debian release
-# so we will try to make it work with both
+# --- Build dependencies for PHP extensions ---
 ARG PHP_BUILD_DEPS="\
     libbz2-dev \
     libfreetype6-dev \
@@ -22,19 +24,24 @@ ARG PHP_BUILD_DEPS="\
     libxml2-dev \
     libxpm-dev \
     libzip-dev \
-    librabbitmq-dev \
-    libprotobuf-dev \
-    protobuf-compiler \
     libldap2-dev \
     libsasl2-dev \
     libtidy-dev \
     libxslt1-dev \
+    libpam0g-dev \
+    libssl-dev \
+    curl \
+    ca-certificates \
+    git \
+    pkg-config \
+    libc-client-dev \
+    libkrb5-dev \
 "
 
-# PHP extensions to install
 ARG PHP_EXTENSIONS="\
     bcmath \
     bz2 \
+    calendar \
     exif \
     ftp \
     gd \
@@ -55,56 +62,96 @@ ARG PHP_EXTENSIONS="\
     zip \
 "
 
-# Detect Debian version and set runtime dependencies accordingly
-RUN set -eux; \
-    if echo "$PHP_VERSION_IMAGE" | grep -q "bullseye$"; then \
-        PHP_RUN_DEPS="\
-            libbz2-1.0 \
-            libfreetype6 \
-            libgmp10 \
-            libicu67 \
-            libjpeg62-turbo \
-            libpng16-16 \
-            libwebp6 \
-            libxml2 \
-            libxpm4 \
-            libxslt1.1 \
-            libzip4 \
-            libpq5 \
-            tidy \
-        "; \
-    elif echo "$PHP_VERSION_IMAGE" | grep -q "trixie$"; then \
-        PHP_RUN_DEPS="\
-            libbz2-1.0 \
-            libfreetype6 \
-            libgmp10 \
-            libicu76 \
-            libjpeg62-turbo \
-            libpng16-16 \
-            libwebp7 \
-            libxml2 \
-            libxpm4 \
-            libxslt1.1 \
-            libzip5 \
-            libpq5 \
-            libtidy58 \
-        "; \
-    else \
-        echo "Unsupported Debian version in PHP_VERSION_IMAGE: $PHP_VERSION_IMAGE"; exit 1; \
-    fi; \
-    apt-get update && apt-get install -y --no-install-recommends \
-        $PHP_BUILD_DEPS \
-        $PHP_RUN_DEPS \
+# --- Install build deps, compile PHP extensions ---
+RUN set -eux \
+    # --- Install runtime libraries depending on Debian codename ---
+    && apt update \
+    && apt upgrade -y \
+    &&  if echo "$PHP_VERSION_IMAGE" | grep -q "bullseye$"; then \
+            apt install -y --no-install-recommends \
+                libc-client2007e \
+                libkrb5-3 \
+                libpng16-16 \
+                libjpeg62-turbo \
+                libfreetype6 \
+                libwebp6 \
+                libxpm4 \
+                libpq5 \
+                libtidy5deb1 \
+                libxslt1.1 \
+                libzip4; \
+        elif echo "$PHP_VERSION_IMAGE" | grep -q "bookworm$"; then \
+            apt install -y --no-install-recommends \
+                libc-client2007e \
+                libkrb5-3 \
+                libpng16-16 \
+                libjpeg62-turbo \
+                libfreetype6 \
+                libwebp7 \
+                libxpm4 \
+                libpq5 \
+                libtidy5deb1 \
+                libxslt1.1 \
+                libzip4; \
+        else \
+            echo "Unsupported Debian version: $CODENAME" && exit 1; \
+        fi \
+    && apt install -y --no-install-recommends $PHP_BUILD_DEPS \
+    \
     && docker-php-ext-configure gd \
         --with-freetype=/usr \
         --with-jpeg=/usr \
         --with-webp=/usr \
         --with-xpm=/usr \
-    && docker-php-ext-install -j$(nproc) $PHP_EXTENSIONS \
-    && apt-get remove -y $PHP_BUILD_DEPS \
-    && apt-get autoremove -y \
-    && apt-get clean \
+    \
+    && docker-php-ext-install -j"$(nproc)" $PHP_EXTENSIONS \
+    \
+    # --- Handle IMAP depending on PHP version ---
+    && if php -r 'exit(version_compare(PHP_VERSION,"8.4.0","<")?0:1);'; then \
+        docker-php-ext-configure imap --with-kerberos --with-imap-ssl; \
+        docker-php-ext-install -j"$(nproc)" imap; \
+    else \
+        printf "\n" \
+            | pecl install imap \
+            || { \
+                echo 'PECL IMAP install failed'; \
+                exit 10; \
+            }; \
+        docker-php-ext-enable imap; \
+    fi \
+    \
+    # --- Cleanup build deps ---
+    && apt purge -y $PHP_BUILD_DEPS \
+    && apt autoremove -y \
+    && apt clean \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
-    && ldconfig
+    && ldconfig \
 
-COPY docker-php-ext-opcache.ini /usr/local/etc/php/conf.d/docker-php-ext-opcache.ini
+    # --- Verify all extensions loaded  and their runtime dependencies ---
+    # Exit codes:
+    # 20 - Missing PHP extension
+    # 30 - Missing .so file for extension
+    # 40 - Missing runtime dependency for extension
+    && for ext in $PHP_EXTENSIONS imap; do \
+        php -m \
+            | grep -qi "$ext" \
+            > /dev/null 2>&1 \
+            || { \
+                echo "Missing PHP extension: $ext"; \
+                exit 20; \
+            }; \
+        EXT_SO="$(php-config --extension-dir)/${ext}.so"; \
+        if [ ! -f "$EXT_SO" ]; then \
+            echo "Missing shared object for extension: $ext ($EXT_SO)"; \
+            exit 30; \
+        fi; \
+        if ldd "$EXT_SO" 2>&1 \
+            | grep -q "not found"; then \
+            echo "Missing runtime dependency for ${ext}.so"; \
+            exit 40; \
+        fi; \
+    done
+
+    # --- Custom PHP configs ---
+    COPY docker-php-ext-opcache.ini /usr/local/etc/php/conf.d/docker-php-ext-opcache.ini
+    COPY docker-php-ext-imap.ini /usr/local/etc/php/conf.d/docker-php-ext-imap.ini
