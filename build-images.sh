@@ -14,7 +14,7 @@ podman build \
     --force-rm \
     --layers \
     --tag "${repobase}/php8.4-fpm" \
-    --build-arg "PHP_VERSION_IMAGE=docker.io/library/php:8.4.13-fpm-bookworm" \
+    --build-arg "PHP_VERSION_IMAGE=docker.io/library/php:8.4.14-fpm-bookworm" \
     container
 
 images+=("${repobase}/php8.4-fpm")
@@ -23,7 +23,7 @@ podman build \
     --force-rm \
     --layers \
     --tag "${repobase}/php8.3-fpm" \
-    --build-arg "PHP_VERSION_IMAGE=docker.io/library/php:8.3.26-fpm-bookworm" \
+    --build-arg "PHP_VERSION_IMAGE=docker.io/library/php:8.3.27-fpm-bookworm" \
     container
 
 images+=("${repobase}/php8.3-fpm")
