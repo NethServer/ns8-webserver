@@ -69,6 +69,54 @@ Retrieve virtualhost john.com backend URL
 Check if virtualhost john.com works as expected
     Retry test    VirtualHost john.com URL is reachable
 
+Check if vhost 9001 can use PHP74
+    ${rc} =    Execute Command    api-cli run module/${module_id}/update-vhost --data '{"PhpVersion":"7.4","ServerNames":["foo.com","john.com"],"Port":9001,"MemoryLimit":1024,"AllowUrlfOpen":"enabled","UploadMaxFilesize":8,"PostMaxSize":16,"MaxExecutionTime":100,"MaxFileUploads":40,"lets_encrypt":true,"http2https":true,"Indexes":"enabled","status":"enabled"}'
+    ...    return_rc=True  return_stdout=False
+    Should Be Equal As Integers    ${rc}  0
+
+Check if virtualhost john.com works as expected
+    Retry test    VirtualHost john.com URL is reachable
+
+Check if vhost 9001 can use PHP80
+    ${rc} =    Execute Command    api-cli run module/${module_id}/update-vhost --data '{"PhpVersion":"8.0","ServerNames":["foo.com","john.com"],"Port":9001,"MemoryLimit":1024,"AllowUrlfOpen":"enabled","UploadMaxFilesize":8,"PostMaxSize":16,"MaxExecutionTime":100,"MaxFileUploads":40,"lets_encrypt":true,"http2https":true,"Indexes":"enabled","status":"enabled"}'
+    ...    return_rc=True  return_stdout=False
+    Should Be Equal As Integers    ${rc}  0
+
+Check if virtualhost john.com works as expected
+    Retry test    VirtualHost john.com URL is reachable
+
+Check if vhost 9001 can use PHP81
+    ${rc} =    Execute Command    api-cli run module/${module_id}/update-vhost --data '{"PhpVersion":"8.1","ServerNames":["foo.com","john.com"],"Port":9001,"MemoryLimit":1024,"AllowUrlfOpen":"enabled","UploadMaxFilesize":8,"PostMaxSize":16,"MaxExecutionTime":100,"MaxFileUploads":40,"lets_encrypt":true,"http2https":true,"Indexes":"enabled","status":"enabled"}'
+    ...    return_rc=True  return_stdout=False
+    Should Be Equal As Integers    ${rc}  0
+
+Check if virtualhost john.com works as expected
+    Retry test    VirtualHost john.com URL is reachable
+
+Check if vhost 9001 can use PHP82
+    ${rc} =    Execute Command    api-cli run module/${module_id}/update-vhost --data '{"PhpVersion":"8.2","ServerNames":["foo.com","john.com"],"Port":9001,"MemoryLimit":1024,"AllowUrlfOpen":"enabled","UploadMaxFilesize":8,"PostMaxSize":16,"MaxExecutionTime":100,"MaxFileUploads":40,"lets_encrypt":true,"http2https":true,"Indexes":"enabled","status":"enabled"}'
+    ...    return_rc=True  return_stdout=False
+    Should Be Equal As Integers    ${rc}  0
+
+Check if virtualhost john.com works as expected
+    Retry test    VirtualHost john.com URL is reachable
+
+Check if vhost 9001 can use PHP83
+    ${rc} =    Execute Command    api-cli run module/${module_id}/update-vhost --data '{"PhpVersion":"8.3","ServerNames":["foo.com","john.com"],"Port":9001,"MemoryLimit":1024,"AllowUrlfOpen":"enabled","UploadMaxFilesize":8,"PostMaxSize":16,"MaxExecutionTime":100,"MaxFileUploads":40,"lets_encrypt":true,"http2https":true,"Indexes":"enabled","status":"enabled"}'
+    ...    return_rc=True  return_stdout=False
+    Should Be Equal As Integers    ${rc}  0
+
+Check if virtualhost john.com works as expected
+    Retry test    VirtualHost john.com URL is reachable
+
+Check if vhost 9001 can use PHP84
+    ${rc} =    Execute Command    api-cli run module/${module_id}/update-vhost --data '{"PhpVersion":"8.4","ServerNames":["foo.com","john.com"],"Port":9001,"MemoryLimit":1024,"AllowUrlfOpen":"enabled","UploadMaxFilesize":8,"PostMaxSize":16,"MaxExecutionTime":100,"MaxFileUploads":40,"lets_encrypt":true,"http2https":true,"Indexes":"enabled","status":"enabled"}'
+    ...    return_rc=True  return_stdout=False
+    Should Be Equal As Integers    ${rc}  0
+
+Check if virtualhost john.com works as expected
+    Retry test    VirtualHost john.com URL is reachable
+
 Check if vhost can be destroyed
     ${rc} =    Execute Command    api-cli run module/${module_id}/destroy-vhost --data '{"ServerNames": ["foo.com","john.com"],"port": 9001}'
     ...    return_rc=True  return_stdout=False
