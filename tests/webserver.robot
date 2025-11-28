@@ -74,7 +74,7 @@ Check if vhost 9001 can use PHP74
     ...    return_rc=True  return_stdout=False
     Should Be Equal As Integers    ${rc}  0
 
-Check if virtualhost john.com works as expected
+Check if virtualhost john.com works as expected after PHP74 update
     Retry test    VirtualHost john.com URL is reachable
 
 Check if vhost 9001 can use PHP80
@@ -82,7 +82,7 @@ Check if vhost 9001 can use PHP80
     ...    return_rc=True  return_stdout=False
     Should Be Equal As Integers    ${rc}  0
 
-Check if virtualhost john.com works as expected
+Check if virtualhost john.com works as expected after PHP80 update
     Retry test    VirtualHost john.com URL is reachable
 
 Check if vhost 9001 can use PHP81
@@ -90,7 +90,7 @@ Check if vhost 9001 can use PHP81
     ...    return_rc=True  return_stdout=False
     Should Be Equal As Integers    ${rc}  0
 
-Check if virtualhost john.com works as expected
+Check if virtualhost john.com works as expected after PHP81 update
     Retry test    VirtualHost john.com URL is reachable
 
 Check if vhost 9001 can use PHP82
@@ -98,7 +98,7 @@ Check if vhost 9001 can use PHP82
     ...    return_rc=True  return_stdout=False
     Should Be Equal As Integers    ${rc}  0
 
-Check if virtualhost john.com works as expected
+Check if virtualhost john.com works as expected after PHP82 update
     Retry test    VirtualHost john.com URL is reachable
 
 Check if vhost 9001 can use PHP83
@@ -106,7 +106,7 @@ Check if vhost 9001 can use PHP83
     ...    return_rc=True  return_stdout=False
     Should Be Equal As Integers    ${rc}  0
 
-Check if virtualhost john.com works as expected
+Check if virtualhost john.com works as expected after PHP83 update
     Retry test    VirtualHost john.com URL is reachable
 
 Check if vhost 9001 can use PHP84
@@ -114,7 +114,7 @@ Check if vhost 9001 can use PHP84
     ...    return_rc=True  return_stdout=False
     Should Be Equal As Integers    ${rc}  0
 
-Check if virtualhost john.com works as expected
+Check if virtualhost john.com works as expected after PHP84 update
     Retry test    VirtualHost john.com URL is reachable
 
 Check if vhost can be destroyed
