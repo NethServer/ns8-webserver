@@ -155,12 +155,6 @@ RUN set -eux \
             exit 40; \
         fi; \
     done
-
     # --- Custom PHP configs ---
-    && if ! php -r 'exit(version_compare(PHP_VERSION,"8.5.0",">=")?0:1);'; then \
-        cp /docker-php-ext-opcache.ini /usr/local/etc/php/conf.d/docker-php-ext-opcache.ini; \
-    fi \
-    && cp /docker-php-ext-imap.ini /usr/local/etc/php/conf.d/docker-php-ext-imap.ini
-
-COPY docker-php-ext-opcache.ini /docker-php-ext-opcache.ini
-COPY docker-php-ext-imap.ini /usr/local/etc/php/conf.d/docker-php-ext-imap.ini
+    COPY docker-php-ext-opcache.ini /docker-php-ext-opcache.ini
+    COPY docker-php-ext-imap.ini /docker-php-ext-imap.ini
