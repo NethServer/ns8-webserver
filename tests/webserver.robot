@@ -182,6 +182,24 @@ Check if phpinfo.php uses PHP 8.4 with the custom settings
     Should Contain    ${output}    <tr><td class="e">max_execution_time</td><td class="v">3600</td><td class="v">3600</td></tr>
     Should Contain    ${output}    <tr><td class="e">max_file_uploads</td><td class="v">20000</td><td class="v">20000</td></tr>
 
+Check if vhost 9001 can use PHP85
+    ${rc} =    Execute Command    api-cli run module/${module_id}/update-vhost --data '{"PhpVersion":"8.5","ServerNames":["foo.com","john.com"],"Port":9001,"MemoryLimit":2000,"AllowUrlfOpen":"enabled","UploadMaxFilesize":2000,"PostMaxSize":2000,"MaxExecutionTime":3600,"MaxFileUploads":20000,"lets_encrypt":true,"http2https":true,"Indexes":"enabled","status":"enabled"}'
+    ...    return_rc=True  return_stdout=False
+    Should Be Equal As Integers    ${rc}  0
+
+Check if virtualhost john.com works as expected after PHP85 update
+    Retry test    VirtualHost john.com URL is reachable
+
+Check if phpinfo.php uses PHP 8.5 with the custom settings
+    ${output} =    Execute Command    curl -H "Host: john.com" ${backend_url}/phpinfo.php
+    Should Contain    ${output}    PHP 8.5
+    Should Contain    ${output}    <tr><td class="e">memory_limit</td><td class="v">2000M</td><td class="v">2000M</td></tr>
+    Should Contain    ${output}    <tr><td class="e">allow_url_fopen</td><td class="v">On</td><td class="v">On</td></tr>
+    Should Contain    ${output}    <tr><td class="e">upload_max_filesize</td><td class="v">2000M</td><td class="v">2000M</td></tr>
+    Should Contain    ${output}    <tr><td class="e">post_max_size</td><td class="v">2000M</td><td class="v">2000M</td></tr>
+    Should Contain    ${output}    <tr><td class="e">max_execution_time</td><td class="v">3600</td><td class="v">3600</td></tr>
+    Should Contain    ${output}    <tr><td class="e">max_file_uploads</td><td class="v">20000</td><td class="v">20000</td></tr>
+
 Login to sftpgo as user 9001 password 9001
     Put File    ${CURDIR}/test-sftpgo-login.sh    /tmp/test-sftpgo-login.sh
     ${user} =    Set Variable    u3@domain.test
