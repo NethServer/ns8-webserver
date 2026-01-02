@@ -267,6 +267,9 @@
             <cv-dropdown-item value="8.4">{{
               $t("virtualhosts.PHP_84")
             }}</cv-dropdown-item>
+            <cv-dropdown-item value="8.5">{{
+              $t("virtualhosts.PHP_85")
+            }}</cv-dropdown-item>
           </cv-dropdown>
           <!-- advanced options -->
           <cv-accordion ref="accordion">
