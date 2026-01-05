@@ -13,6 +13,15 @@ reponame="webserver"
 podman build \
     --force-rm \
     --layers \
+    --tag "${repobase}/php8.5-fpm" \
+    --build-arg "PHP_VERSION_IMAGE=docker.io/library/php:8.5.1-fpm-bookworm" \
+    container
+
+images+=("${repobase}/php8.5-fpm")
+
+podman build \
+    --force-rm \
+    --layers \
     --tag "${repobase}/php8.4-fpm" \
     --build-arg "PHP_VERSION_IMAGE=docker.io/library/php:8.4.15-fpm-bookworm" \
     container

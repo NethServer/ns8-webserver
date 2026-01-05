@@ -49,7 +49,6 @@ ARG PHP_EXTENSIONS="\
     intl \
     ldap \
     mysqli \
-    opcache \
     pcntl \
     pdo_mysql \
     pdo_pgsql \
@@ -106,6 +105,11 @@ RUN set -eux \
     \
     && docker-php-ext-install -j"$(nproc)" $PHP_EXTENSIONS \
     \
+    # --- Handle opcache depending on PHP version (skip for 8.5.x) ---
+    && if php -r 'exit(version_compare(PHP_VERSION,"8.5.0","<")?0:1);'; then \
+        docker-php-ext-install -j"$(nproc)" opcache; \
+    fi \
+    \
     # --- Handle IMAP depending on PHP version ---
     && if php -r 'exit(version_compare(PHP_VERSION,"8.4.0","<")?0:1);'; then \
         docker-php-ext-configure imap --with-kerberos --with-imap-ssl; \
@@ -151,7 +155,6 @@ RUN set -eux \
             exit 40; \
         fi; \
     done
-
     # --- Custom PHP configs ---
     COPY docker-php-ext-opcache.ini /usr/local/etc/php/conf.d/docker-php-ext-opcache.ini
     COPY docker-php-ext-imap.ini /usr/local/etc/php/conf.d/docker-php-ext-imap.ini
