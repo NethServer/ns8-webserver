@@ -156,5 +156,5 @@ RUN set -eux \
         fi; \
     done
     # --- Custom PHP configs ---
-    COPY docker-php-ext-opcache.ini /docker-php-ext-opcache.ini
-    COPY docker-php-ext-imap.ini /docker-php-ext-imap.ini
+    COPY docker-php-ext-opcache.ini /usr/local/etc/php/conf.d/docker-php-ext-opcache.ini
+    COPY docker-php-ext-imap.ini /usr/local/etc/php/conf.d/docker-php-ext-imap.ini
