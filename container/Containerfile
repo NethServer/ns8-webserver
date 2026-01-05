@@ -106,7 +106,7 @@ RUN set -eux \
     && docker-php-ext-install -j"$(nproc)" $PHP_EXTENSIONS \
     \
     # --- Handle opcache depending on PHP version (skip for 8.5.x) ---
-    &&  if ! echo "$PHP_VERSION_IMAGE" | grep -q "8.5"; then \
+    && if php -r 'exit(version_compare(PHP_VERSION,"8.5.0","<")?0:1);'; then \
         docker-php-ext-install -j"$(nproc)" opcache; \
     fi \
     \
