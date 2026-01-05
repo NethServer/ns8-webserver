@@ -40,6 +40,12 @@
     },
     {
       "matchDatasources": ["docker"],
+      "matchPackageNames": ["php"],
+      "matchCurrentVersion": "/^8\\.5\\./",
+      "allowedVersions": "/^8\\.5\\./"
+    },
+    {
+      "matchDatasources": ["docker"],
       "matchPackageNames": ["nginx"],
       "allowedVersions": "1.28.*"
     }
