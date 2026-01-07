@@ -21,6 +21,7 @@ ExecStartPre=/usr/bin/podman pod create --infra-conmon-pidfile %t/webserver.pid 
     --publish  ${SFTP_TCP_PORT}:2022 \
     --publish  127.0.0.1:${SFTPGO_TCP_PORT}:8080 \
     --replace
+    --network=slirp4netns:allow_host_loopback=true
 ExecStart=/usr/bin/podman pod start --pod-id-file %t/webserver.pod-id
 ExecStop=/usr/bin/podman pod stop --ignore --pod-id-file %t/webserver.pod-id -t 10
 ExecStopPost=/usr/bin/podman pod rm --ignore -f --pod-id-file %t/webserver.pod-id
