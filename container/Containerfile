@@ -36,6 +36,8 @@ ARG PHP_BUILD_DEPS="\
     pkg-config \
     libc-client-dev \
     libkrb5-dev \
+    libmagickwand-dev \
+    libmagick++-dev \
 "
 
 ARG PHP_EXTENSIONS="\
@@ -66,6 +68,7 @@ RUN set -eux \
     # --- Install runtime libraries depending on Debian codename ---
     && apt update \
     && apt upgrade -y \
+    && apt install -y ca-certificates \
     &&  if echo "$PHP_VERSION_IMAGE" | grep -q "bullseye$"; then \
             apt install -y --no-install-recommends \
                 libc-client2007e \
@@ -78,7 +81,8 @@ RUN set -eux \
                 libpq5 \
                 libtidy5deb1 \
                 libxslt1.1 \
-                libzip4; \
+                libzip4 \
+                libmagickwand-6.q16-6; \
         elif echo "$PHP_VERSION_IMAGE" | grep -q "bookworm$"; then \
             apt install -y --no-install-recommends \
                 libc-client2007e \
@@ -91,7 +95,8 @@ RUN set -eux \
                 libpq5 \
                 libtidy5deb1 \
                 libxslt1.1 \
-                libzip4; \
+                libzip4 \
+                libmagickwand-6.q16-6; \
         else \
             echo "Unsupported Debian version: $CODENAME" && exit 1; \
         fi \
@@ -124,19 +129,27 @@ RUN set -eux \
         docker-php-ext-enable imap; \
     fi \
     \
+    # --- Install imagick via PECL ---
+    && pecl install imagick \
+        || { \
+            echo 'PECL imagick install failed'; \
+            exit 11; \
+        } \
+    && docker-php-ext-enable imagick \
+    \
     # --- Cleanup build deps ---
     && apt purge -y $PHP_BUILD_DEPS \
     && apt autoremove -y \
     && apt clean \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
     && ldconfig \
-
+    \
     # --- Verify all extensions loaded  and their runtime dependencies ---
     # Exit codes:
     # 20 - Missing PHP extension
     # 30 - Missing .so file for extension
     # 40 - Missing runtime dependency for extension
-    && for ext in $PHP_EXTENSIONS imap; do \
+    && for ext in $PHP_EXTENSIONS imap imagick; do \
         php -m \
             | grep -qi "$ext" \
             > /dev/null 2>&1 \
