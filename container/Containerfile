@@ -31,7 +31,6 @@ ARG PHP_BUILD_DEPS="\
     libpam0g-dev \
     libssl-dev \
     curl \
-    ca-certificates \
     git \
     pkg-config \
     libc-client-dev \
