@@ -10,68 +10,29 @@ repobase="${REPOBASE:-ghcr.io/nethserver}"
 # Configure the image name
 reponame="webserver"
 
-podman build \
-    --force-rm \
-    --layers \
-    --tag "${repobase}/php8.5-fpm" \
-    --build-arg "PHP_VERSION_IMAGE=docker.io/library/php:8.5.1-fpm-bookworm" \
-    container
+# Function to build PHP FPM images
+build_php_image() {
+    local version=$1
+    local php_image=$2
+    
+    podman build \
+        --force-rm \
+        --layers \
+        --tag "${repobase}/php${version}-fpm" \
+        --build-arg "PHP_VERSION_IMAGE=${php_image}" \
+        container
+    
+    images+=("${repobase}/php${version}-fpm")
+}
 
-images+=("${repobase}/php8.5-fpm")
-
-podman build \
-    --force-rm \
-    --layers \
-    --tag "${repobase}/php8.4-fpm" \
-    --build-arg "PHP_VERSION_IMAGE=docker.io/library/php:8.4.15-fpm-bookworm" \
-    container
-
-images+=("${repobase}/php8.4-fpm")
-
-podman build \
-    --force-rm \
-    --layers \
-    --tag "${repobase}/php8.3-fpm" \
-    --build-arg "PHP_VERSION_IMAGE=docker.io/library/php:8.3.28-fpm-bookworm" \
-    container
-
-images+=("${repobase}/php8.3-fpm")
-
-podman build \
-    --force-rm \
-    --layers \
-    --tag "${repobase}/php8.2-fpm" \
-    --build-arg "PHP_VERSION_IMAGE=docker.io/library/php:8.2.29-fpm-bookworm" \
-    container
-
-images+=("${repobase}/php8.2-fpm")
-
-podman build \
-    --force-rm \
-    --layers \
-    --tag "${repobase}/php8.1-fpm" \
-    --build-arg "PHP_VERSION_IMAGE=docker.io/library/php:8.1.33-fpm-bookworm" \
-    container
-
-images+=("${repobase}/php8.1-fpm")
-
-podman build \
-    --force-rm \
-    --layers \
-    --tag "${repobase}/php8.0-fpm" \
-    --build-arg "PHP_VERSION_IMAGE=docker.io/library/php:8.0.30-fpm-bullseye" \
-    container
-
-images+=("${repobase}/php8.0-fpm")
-
-podman build \
-    --force-rm \
-    --layers \
-    --tag "${repobase}/php7.4-fpm" \
-    --build-arg "PHP_VERSION_IMAGE=docker.io/library/php:7.4.33-fpm-bullseye" \
-    container
-
-images+=("${repobase}/php7.4-fpm")
+# Build all PHP FPM images
+build_php_image "8.5" "docker.io/library/php:8.5.1-fpm-bookworm"
+build_php_image "8.4" "docker.io/library/php:8.4.15-fpm-bookworm"
+build_php_image "8.3" "docker.io/library/php:8.3.28-fpm-bookworm"
+build_php_image "8.2" "docker.io/library/php:8.2.29-fpm-bookworm"
+build_php_image "8.1" "docker.io/library/php:8.1.33-fpm-bookworm"
+build_php_image "8.0" "docker.io/library/php:8.0.30-fpm-bullseye"
+build_php_image "7.4" "docker.io/library/php:7.4.33-fpm-bullseye"
 
 # Create a new empty container image
 container=$(buildah from scratch)
