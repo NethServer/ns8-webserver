@@ -346,6 +346,42 @@ Warning: using user "cluster" credentials from the environment
   "http2https": true
 }
 ```
+## Smarthost setting discovery
+
+Some configuration settings, like the smarthost setup, are not part of the
+`configure-module` action input: they are discovered by looking at some
+Redis keys.  To ensure the module is always up-to-date with the
+centralized [smarthost
+setup](https://nethserver.github.io/ns8-core/core/smarthost/) every time
+kickstart starts, the command `bin/discover-smarthost` runs and refreshes
+the `state/smarthost.env` file with fresh values from Redis.
+
+Furthermore if smarthost setup is changed when kickstart is already
+running, the event handler `events/smarthost-changed/10reload_services`
+restarts the main module service.
+
+See also the `systemd/user/phpfpm@.service` file.
+
+### Environment files for PHP versions
+
+The systemd service is templated using `phpfpm@.service` to support multiple PHP versions.
+Environment files are present and loaded inside the container for each PHP version instance.
+For example, when the systemd service `phpfpm@8.5.service` runs, it loads the following environment files:
+
+- `state/smarthost.env` - SMTP and smarthost configuration (optional, prefixed with `SMTP_`)
+
+These environment variables are automatically passed to the corresponding PHP-FPM container instance, allowing configuration to be centrally managed through environment files that apply to all PHP versions (8.5, 8.4, 8.3, etc.).
+This setting discovery is just an example to understand how the module is expected to work:
+```
+cat smarthost.env 
+SMTP_ENABLED=1
+SMTP_HOST=10.5.4.1
+SMTP_PORT=25
+SMTP_USERNAME=
+SMTP_PASSWORD=
+SMTP_ENCRYPTION=none
+SMTP_TLSVERIFY=
+```
 
 ## Uninstall
 
