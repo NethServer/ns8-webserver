@@ -356,7 +356,7 @@ setup](https://nethserver.github.io/ns8-core/core/smarthost/) every time
 kickstart starts, the command `bin/discover-smarthost` runs and refreshes
 the `state/smarthost.env` file with fresh values from Redis.
 
-Furthermore if smarthost setup is changed when kickstart is already
+Furthermore if smarthost setup is changed when webserver is already
 running, the event handler `events/smarthost-changed/10reload_services`
 restarts the main module service.
 
