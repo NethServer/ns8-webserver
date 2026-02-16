@@ -20,7 +20,12 @@ php_value = sys.argv[1]
 rdb = agent.redis_connect(use_replica=True)
 smtp_settings = agent.get_smarthost_settings(rdb)
 
-envfile = f'php{php_value}_smarthost.env'
+# create the smarthost folder
+envfile = f'smarthosts/php{php_value}_smarthost.env'
+
+# Ensure the target directory exists:
+os.makedirs(os.path.dirname(envfile), exist_ok=True)
+
 
 # Using .tmp suffix: do not overwrite the target file until the new one is
 # saved to disk:
