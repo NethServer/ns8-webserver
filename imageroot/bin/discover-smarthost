@@ -9,12 +9,18 @@ import sys
 import agent
 import os
 
+# retrieve the first argument as the php value
+if len(sys.argv) <= 1:
+    print("Error: Missing argument for PHP value", file=sys.stderr)
+    sys.exit(1)
+php_value = sys.argv[1]
+
 # Connect the local Redis replica. This is necessary to consistently start
 # the service if the leader node is not reachable:
 rdb = agent.redis_connect(use_replica=True)
 smtp_settings = agent.get_smarthost_settings(rdb)
 
-envfile = "smarthost.env"
+envfile = f'php{php_value}_smarthost.env'
 
 # Using .tmp suffix: do not overwrite the target file until the new one is
 # saved to disk:
