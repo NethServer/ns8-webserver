@@ -353,12 +353,12 @@ Some configuration settings, like the smarthost setup, are not part of the
 Redis keys.  To ensure the module is always up-to-date with the
 centralized [smarthost
 setup](https://nethserver.github.io/ns8-core/core/smarthost/) every time
-kickstart starts, the command `bin/discover-smarthost` runs and refreshes
+`phpfpm@.service` starts, the command `bin/discover-smarthost` runs and refreshes
 the `state/smarthost.env` file with fresh values from Redis.
 
 Furthermore if smarthost setup is changed when webserver is already
 running, the event handler `events/smarthost-changed/10reload_services`
-restarts the main module service.
+restarts `phpfpm@.service`.
 
 See also the `systemd/user/phpfpm@.service` file.
 
