@@ -1,0 +1,19 @@
+#!/usr/bin/env python3
+
+#
+# Copyright (C) 2026 Nethesis S.r.l.
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+
+import subprocess
+import glob
+import re
+
+# detect if a service has configurations and restart it
+PhpServiceArray = glob.glob('php*-fpm-custom.d')
+for folder in PhpServiceArray:
+    ConfiguredServices = re.findall('php[0-9\.]+', folder)
+    ListConfigurations = glob.glob(folder+'/dyn-*.conf')
+    if ListConfigurations :
+        subprocess.run(["download-php-fpm",ConfiguredServices[0].replace('php','')])
+        subprocess.run(["systemctl", "--user", "restart", "phpfpm@"+ConfiguredServices[0].replace('php','')+".service"])
