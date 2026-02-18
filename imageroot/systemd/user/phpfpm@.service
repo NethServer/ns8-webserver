@@ -14,13 +14,13 @@ Restart=always
 TimeoutStopSec=70
 ExecStartPre=/bin/rm -f %t/php%i-fpm.pid %t/php%i-fpm.ctr-id
 ExecStartPre=/usr/bin/mkdir -p %S/state/php%i-fpm-custom.d
-ExecStartPre=-runagent discover-smarthost
+ExecStartPre=-/usr/local/bin/runagent discover-smarthost
 ExecStart=/usr/bin/podman run --conmon-pidfile %t/php%i-fpm.pid \
     --cidfile %t/php%i-fpm.ctr-id --cgroups=no-conmon \
     --pod-id-file %t/webserver.pod-id --replace -d --name  php%i-fpm \
     --volume websites:/var/www/html:z \
     --volume %S/state/php%i-fpm-custom.d:/usr/local/etc/php-fpm.d:z \
-    --env SMTP_* \
+    --env-file %S/state/smarthosts/smarthost.env \
     ghcr.io/nethserver/php%i-fpm:${IMAGE_URL_TAG}
 ExecStop=/usr/bin/podman stop --ignore --cidfile %t/php%i-fpm.ctr-id -t 10
 ExecReload=/usr/bin/mkdir -p %S/state/php%i-fpm-custom.d
