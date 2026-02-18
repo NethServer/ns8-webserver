@@ -354,11 +354,10 @@ Redis keys.  To ensure the module is always up-to-date with the
 centralized [smarthost
 setup](https://nethserver.github.io/ns8-core/core/smarthost/) every time
 `phpfpm@.service` starts, the command `bin/discover-smarthost` runs and refreshes
-the `state/smarthost.env` file with fresh values from Redis.
+the `state/smarthosts/smarthost.env` file with fresh values from Redis.
 
 Furthermore if smarthost setup is changed when webserver is already
-running, the event handler `events/smarthost-changed/10reload_services`
-restarts `phpfpm@.service`.
+running, the event smarthost-changed restarts `phpfpm@.service` and discover the new settings.
 
 See also the `systemd/user/phpfpm@.service` file.
 
@@ -373,7 +372,7 @@ For example, when the systemd service `phpfpm@8.5.service` runs, it loads the fo
 These environment variables are automatically passed to the corresponding PHP-FPM container instance, allowing configuration to be centrally managed through environment files that apply to all PHP versions (8.5, 8.4, 8.3, etc.).
 This setting discovery is just an example to understand how the module is expected to work:
 ```
-cat smarthost.env 
+cat state/smarthosts/smarthost.env 
 SMTP_ENABLED=1
 SMTP_HOST=10.5.4.1
 SMTP_PORT=25
