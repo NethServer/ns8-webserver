@@ -140,6 +140,8 @@ We use a software called sftpgo as a sftp server to upload web content to the we
 Launch `configure-module`, by setting the following parameters:
 - `path`: <name of the web path>
 - `http2https`: <true|false>
+- `sftpgo_service`: <true|false> - Enable or disable the SFTPGO external service
+- `sftp_tcp_port`: <port number> - The TCP port for the SFTP service (1024-65535)
 
 
 Example:
@@ -147,13 +149,16 @@ Example:
 api-cli run  configure-module --agent module/webserver1 --data - <<EOF
 { 
 "path":"/sftpgo",
-"http2https": true
+"http2https": true,
+"sftp_tcp_port": 3092,
+"sftpgo_service": true
 }
 EOF
 ```
 The above command will:
 - start and configure the sftpgo instance
 - force http to https
+- enable the SFTPGO external service on port 3092
 
 
 Send a test HTTP request to the webserver backend service:
@@ -313,14 +318,16 @@ Warning: using user "cluster" credentials from the environment
       ],
       "Port": 9001,
       "PhpVersion": "7.4",
-      "memorylimit": 512,
+      "MemoryLimit": 512,
       "allowurlfopen": "disabled",
-      "uploadmaxfilesize": 4,
-      "postmaxsize": 8,
-      "maxexecutiontime": 0,
-      "maxfileuploads": 20,
+      "UploadMaxFilesize": 4,
+      "PostMaxSize": 8,
+      "MaxExecutionTime": 0,
+      "MaxFileUploads": 20,
       "Indexes": "disabled",
       "status": "enabled",
+      "http2https": true,
+      "lets_encrypt": false,
       "name": "9001"
     },
     {
@@ -330,22 +337,39 @@ Warning: using user "cluster" credentials from the environment
       ],
       "Port": 9002,
       "PhpVersion": "",
-      "memorylimit": 512,
+      "MemoryLimit": 512,
       "allowurlfopen": "disabled",
-      "uploadmaxfilesize": 4,
-      "postmaxsize": 8,
-      "maxexecutiontime": 0,
-      "maxfileuploads": 20,
+      "UploadMaxFilesize": 4,
+      "PostMaxSize": 8,
+      "MaxExecutionTime": 0,
+      "MaxFileUploads": 20,
       "Indexes": "disabled",
       "status": "enabled",
+      "http2https": true,
+      "lets_encrypt": false,
       "name": "9002"
     }
   ],
   "sftp_tcp_port": 20029,
   "path": "/sftpgo",
-  "http2https": true
+  "http2https": true,
+  "sftpgo_service": true,
+  "sftpgo_isrunning": true,
+  "NextFpmPort": 9003,
+  "hostname": "foo.domain.com"
 }
 ```
+
+### Configuration response fields:
+
+- `virtualhost`: Array of virtualhost configurations with all settings
+- `sftp_tcp_port`: The TCP port used for SFTP access
+- `path`: The web path where sftpgo is served
+- `http2https`: Whether HTTP to HTTPS redirection is enabled
+- `sftpgo_service`: Whether the SFTPGO external service is enabled
+- `sftpgo_isrunning`: Current status - whether sftpgo service is running
+- `NextFpmPort`: The next TCP port that will be assigned for a new virtualhost
+- `hostname`: The hostname of the node
 ## Smarthost setting discovery
 
 Some configuration settings, like the smarthost setup, are not part of the
