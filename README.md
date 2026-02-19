@@ -391,12 +391,12 @@ The systemd service is templated using `phpfpm@.service` to support multiple PHP
 Environment files are present and loaded inside the container for each PHP version instance.
 For example, when the systemd service `phpfpm@8.5.service` runs, it loads the following environment files:
 
-- `state/smarthost.env` - SMTP and smarthost configuration (optional, prefixed with `SMTP_`)
+- `state/smarthosts/smarthost.env` - SMTP and smarthost configuration (optional, prefixed with `SMTP_`)
 
 These environment variables are automatically passed to the corresponding PHP-FPM container instance, allowing configuration to be centrally managed through environment files that apply to all PHP versions (8.5, 8.4, 8.3, etc.).
 This setting discovery is just an example to understand how the module is expected to work:
+
 ```
-cat state/smarthosts/smarthost.env 
 SMTP_ENABLED=1
 SMTP_HOST=10.5.4.1
 SMTP_PORT=25
