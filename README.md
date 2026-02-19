@@ -380,8 +380,8 @@ setup](https://nethserver.github.io/ns8-core/core/smarthost/) every time
 `phpfpm@.service` starts, the command `bin/discover-smarthost` runs and refreshes
 the `state/smarthosts/smarthost.env` file with fresh values from Redis.
 
-Furthermore if smarthost setup is changed when webserver is already
-running, the event smarthost-changed restarts `phpfpm@.service` and discover the new settings.
+Furthermore, if the smarthost setup is changed while the webserver is already
+running, the smarthost-changed event restarts `phpfpm@.service` and discovers the new settings.
 
 See also the `systemd/user/phpfpm@.service` file.
 
