@@ -1,0 +1,36 @@
+#!/usr/bin/env python3
+
+#
+# Copyright (C) 2026 Nethesis S.r.l.
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+
+import agent
+import os
+
+# Connect the local Redis replica. This is necessary to consistently start
+# the service if the leader node is not reachable:
+rdb = agent.redis_connect(use_replica=True)
+smtp_settings = agent.get_smarthost_settings(rdb)
+
+# create the smarthost folder
+envfile = 'smarthosts/smarthost.env'
+
+# Ensure the target directory exists:
+os.makedirs(os.path.dirname(envfile), exist_ok=True)
+
+# Create a unique temporary file using process PID to avoid concurrent writes:
+tmp_path = f"{envfile}.tmp.{os.getpid()}"
+
+with open(tmp_path, "w") as efp:
+    # HINT for lamp: adjust variable names as needed
+    print(f"SMTP_ENABLED={'1' if smtp_settings['enabled'] else ''}", file=efp)
+    print(f"SMTP_HOST={smtp_settings['host']}", file=efp)
+    print(f"SMTP_PORT={smtp_settings['port']}", file=efp)
+    print(f"SMTP_USERNAME={smtp_settings['username']}", file=efp)
+    print(f"SMTP_PASSWORD={smtp_settings['password']}", file=efp)
+    print(f"SMTP_ENCRYPTION={smtp_settings['encrypt_smtp']}", file=efp)
+    print(f"SMTP_TLSVERIFY={'1' if smtp_settings['tls_verify'] else ''}", file=efp)
+
+# Commit changes by atomically replacing the existing envfile:
+os.replace(tmp_path, envfile)

@@ -140,6 +140,8 @@ We use a software called sftpgo as a sftp server to upload web content to the we
 Launch `configure-module`, by setting the following parameters:
 - `path`: <name of the web path>
 - `http2https`: <true|false>
+- `sftpgo_service`: <true|false> - Enable or disable the SFTPGO external service
+- `sftp_tcp_port`: <port number> - The TCP port for the SFTP service (1024-65535)
 
 
 Example:
@@ -147,13 +149,16 @@ Example:
 api-cli run  configure-module --agent module/webserver1 --data - <<EOF
 { 
 "path":"/sftpgo",
-"http2https": true
+"http2https": true,
+"sftp_tcp_port": 3092,
+"sftpgo_service": true
 }
 EOF
 ```
 The above command will:
 - start and configure the sftpgo instance
 - force http to https
+- enable the SFTPGO external service on port 3092
 
 
 Send a test HTTP request to the webserver backend service:
@@ -313,14 +318,16 @@ Warning: using user "cluster" credentials from the environment
       ],
       "Port": 9001,
       "PhpVersion": "7.4",
-      "memorylimit": 512,
+      "MemoryLimit": 512,
       "allowurlfopen": "disabled",
-      "uploadmaxfilesize": 4,
-      "postmaxsize": 8,
-      "maxexecutiontime": 0,
-      "maxfileuploads": 20,
+      "UploadMaxFilesize": 4,
+      "PostMaxSize": 8,
+      "MaxExecutionTime": 0,
+      "MaxFileUploads": 20,
       "Indexes": "disabled",
       "status": "enabled",
+      "http2https": true,
+      "lets_encrypt": false,
       "name": "9001"
     },
     {
@@ -330,21 +337,73 @@ Warning: using user "cluster" credentials from the environment
       ],
       "Port": 9002,
       "PhpVersion": "",
-      "memorylimit": 512,
+      "MemoryLimit": 512,
       "allowurlfopen": "disabled",
-      "uploadmaxfilesize": 4,
-      "postmaxsize": 8,
-      "maxexecutiontime": 0,
-      "maxfileuploads": 20,
+      "UploadMaxFilesize": 4,
+      "PostMaxSize": 8,
+      "MaxExecutionTime": 0,
+      "MaxFileUploads": 20,
       "Indexes": "disabled",
       "status": "enabled",
+      "http2https": true,
+      "lets_encrypt": false,
       "name": "9002"
     }
   ],
   "sftp_tcp_port": 20029,
   "path": "/sftpgo",
-  "http2https": true
+  "http2https": true,
+  "sftpgo_service": true,
+  "sftpgo_isrunning": true,
+  "NextFpmPort": 9003,
+  "hostname": "foo.domain.com"
 }
+```
+
+### Configuration response fields:
+
+- `virtualhost`: Array of virtualhost configurations with all settings
+- `sftp_tcp_port`: The TCP port used for SFTP access
+- `path`: The web path where sftpgo is served
+- `http2https`: Whether HTTP to HTTPS redirection is enabled
+- `sftpgo_service`: Whether the SFTPGO external service is enabled
+- `sftpgo_isrunning`: Current status - whether sftpgo service is running
+- `NextFpmPort`: The next TCP port that will be assigned for a new virtualhost
+- `hostname`: The hostname of the node
+## Smarthost setting discovery
+
+Some configuration settings, like the smarthost setup, are not part of the
+`configure-module` action input: they are discovered by looking at some
+Redis keys.  To ensure the module is always up-to-date with the
+centralized [smarthost
+setup](https://nethserver.github.io/ns8-core/core/smarthost/) every time
+`phpfpm@.service` starts, the command `bin/discover-smarthost` runs and refreshes
+the `state/smarthosts/smarthost.env` file with fresh values from Redis.
+
+Furthermore, if the smarthost setup is changed while the webserver is already
+running, the smarthost-changed event restarts `phpfpm@.service` and discovers the new settings.
+
+See also the `systemd/user/phpfpm@.service` file.
+
+### Environment files for PHP versions
+
+The systemd service is templated using `phpfpm@.service` to support multiple PHP versions.
+Environment files are present and loaded inside the container for each PHP version instance.
+For example, when the systemd service `phpfpm@8.5.service` runs, it loads the following environment files:
+
+- `state/smarthosts/smarthost.env` - SMTP and smarthost configuration (optional, prefixed with `SMTP_`)
+
+These environment variables are automatically passed to the corresponding PHP-FPM container instance, allowing configuration to be centrally managed through environment files that apply to all PHP versions (8.5, 8.4, 8.3, etc.).
+This setting discovery is just an example to understand how the module is expected to work:
+
+```
+SMTP_ENABLED=1
+SMTP_HOST=10.5.4.1
+SMTP_PORT=25
+SMTP_USERNAME=
+SMTP_PASSWORD=
+SMTP_ENCRYPTION=none
+SMTP_TLSVERIFY=
 ```
 
 ## Uninstall

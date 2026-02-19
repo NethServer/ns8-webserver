@@ -1,0 +1,30 @@
+#!/usr/bin/env python3
+
+#
+# Copyright (C) 2026 Nethesis S.r.l.
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+
+import subprocess
+import glob
+import re
+import sys
+
+# detect if a service has configurations and restart it
+PhpServiceArray = glob.glob('php*-fpm-custom.d')
+for folder in PhpServiceArray:
+    ConfiguredServices = re.findall('php[0-9\.]+', folder)
+    if not ConfiguredServices:
+        # Skip folders that do not match the expected php version pattern
+        continue
+    php_version = ConfiguredServices[0].replace('php', '')
+    ListConfigurations = glob.glob(folder + '/dyn-*.conf')
+    if ListConfigurations:
+        try:
+            subprocess.run(["download-php-fpm", php_version], check=True)
+            subprocess.run(
+                ["systemctl", "--user", "restart", f"phpfpm@{php_version}.service"],
+                check=True,
+            )
+        except subprocess.CalledProcessError as e:
+            print(f"Error handling php-fpm service for {php_version}: {e}", file=sys.stderr, flush=True)
