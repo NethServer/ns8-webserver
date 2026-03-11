@@ -4,7 +4,7 @@
     "en": "NGINX web server with php-fpm stack",
     "it": "Server web NGINX con stack php-fpm"
   },
-  "categories": [],
+  "categories": ["web"],
   "authors": [
     {
       "name": "Stephane de Labrusse",
