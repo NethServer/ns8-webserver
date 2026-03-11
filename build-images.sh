@@ -28,7 +28,7 @@ build_php_image() {
 # Build all PHP FPM images
 build_php_image "8.5" "docker.io/library/php:8.5.1-fpm-bookworm"
 build_php_image "8.4" "docker.io/library/php:8.4.15-fpm-bookworm"
-build_php_image "8.3" "docker.io/library/php:8.3.28-fpm-bookworm"
+build_php_image "8.3" "docker.io/library/php:8.3.30-fpm-bookworm"
 build_php_image "8.2" "docker.io/library/php:8.2.30-fpm-bookworm"
 build_php_image "8.1" "docker.io/library/php:8.1.34-fpm-bookworm"
 build_php_image "8.0" "docker.io/library/php:8.0.30-fpm-bullseye"
