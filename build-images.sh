@@ -54,7 +54,7 @@ buildah config --entrypoint=/ \
     --label="org.nethserver.authorizations=node:fwadm traefik@node:routeadm" \
     --label="org.nethserver.tcp-ports-demand=2" \
     --label="org.nethserver.rootfull=0" \
-    --label="org.nethserver.images=docker.io/nginx:1.28.0-alpine docker.io/drakkan/sftpgo:v2.7.0-alpine" \
+    --label="org.nethserver.images=docker.io/nginx:1.28.0-alpine docker.io/drakkan/sftpgo:v2.7.1-alpine" \
     "${container}"
 # Commit the image
 buildah commit "${container}" "${repobase}/${reponame}"
