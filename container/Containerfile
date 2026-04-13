@@ -66,7 +66,6 @@ ARG PHP_EXTENSIONS="\
 RUN set -eux \
     # --- Install runtime libraries depending on Debian codename ---
     && apt update \
-    && apt upgrade -y \
     && apt install -y ca-certificates openssl\
     &&  if echo "$PHP_VERSION_IMAGE" | grep -q "bullseye$"; then \
             apt install -y --no-install-recommends \
