@@ -42,7 +42,7 @@ kill_all_builds() {
     done
 }
 # Full trap replaces the early one: also kill builds and close FD 3 on exit
-trap 'kill_all_builds; exec 3<&-; exec 3>&-; rm -rf "${tmpdir}"' EXIT
+trap 'kill_all_builds; exec 3<&-; rm -rf "${tmpdir}"' EXIT
 trap 'kill_all_builds; exit 130' INT
 trap 'kill_all_builds; exit 143' TERM
 
