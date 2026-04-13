@@ -95,7 +95,7 @@ echo "Starting UI build with Node..."
     (
         set +e
         # Reuse existing nodebuilder-webserver container, to speed up builds
-        if ! buildah containers --format "{{.ContainerName}}" | grep -q nodebuilder-webserver; then
+        if ! buildah containers --format "{{.ContainerName}}" | grep -qx nodebuilder-webserver; then
             echo "[node] Pulling NodeJS runtime..."
             buildah from --name nodebuilder-webserver -v "${PWD}:/usr/src:Z" docker.io/library/node:24-slim
         fi
@@ -109,13 +109,28 @@ echo "Starting UI build with Node..."
 ) &
 pids+=("$!")
 
-# Read results in completion order; stop everything on first failure
+# Read results in completion order; stop everything on first failure.
+# Use read -t to avoid blocking forever if a worker is SIGKILL'd and never writes
+# its result. On each timeout, check whether any tracked job is still alive; if
+# none are, the FIFO will never receive another line and we fail fast.
 total=${#pids[@]}
 for (( completed=0; completed<total; completed++ )); do
-    if ! read -r done_version done_result <&3; then
-        echo "[main] Failed to read build result from result FIFO"
-        exit 1
-    fi
+    while true; do
+        if read -r -t 30 done_version done_result <&3; then
+            break
+        fi
+        any_alive=0
+        for pid in "${pids[@]}"; do
+            if kill -0 "${pid}" 2>/dev/null; then
+                any_alive=1
+                break
+            fi
+        done
+        if [[ "${any_alive}" -eq 0 ]]; then
+            echo "[main] Timed out waiting for build result and no build jobs are running"
+            exit 1
+        fi
+    done
     if [[ -z "${done_version}" || -z "${done_result}" || ! "${done_result}" =~ ^-?[0-9]+$ ]]; then
         echo "[main] Malformed build result from result FIFO: version='${done_version}' result='${done_result}'"
         exit 1
