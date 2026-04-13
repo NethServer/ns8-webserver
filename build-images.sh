@@ -127,8 +127,9 @@ for (( completed=0; completed<total; completed++ )); do
     echo "[${done_version}] BUILD OK"
 done
 
-# Reap all background build jobs to avoid zombies
-wait "${pids[@]}"
+# Reap any remaining background build jobs to avoid zombies.
+# Bare wait avoids exit 127 for jobs already reaped by wait -n during throttling.
+wait
 
 for (( i=0; i<${#PHP_VERSIONS[@]}; i+=2 )); do
     images+=("${repobase}/php${PHP_VERSIONS[$i]}-fpm")
