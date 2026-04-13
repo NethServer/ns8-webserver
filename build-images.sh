@@ -88,7 +88,11 @@ for (( i=0; i<${#PHP_VERSIONS[@]}; i+=2 )); do
     fi
 done
 
-# Launch Node UI build in parallel with PHP builds
+# Launch Node UI build in parallel with PHP builds, counting it toward max_parallel
+if (( active_jobs >= max_parallel )); then
+    wait -n 2>/dev/null || true
+    active_jobs=$(( active_jobs - 1 ))
+fi
 echo "Starting UI build with Node..."
 (
     set +e
