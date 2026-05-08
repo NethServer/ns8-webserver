@@ -17,7 +17,7 @@ declare -a PHP_VERSIONS=(
     "8.5" "docker.io/library/php:8.5.5-fpm-bookworm"
     "8.4" "docker.io/library/php:8.4.20-fpm-bookworm"
     "8.3" "docker.io/library/php:8.3.30-fpm-bookworm"
-    "8.2" "docker.io/library/php:8.2.30-fpm-bookworm"
+    "8.2" "docker.io/library/php:8.2.31-fpm-bookworm"
     "8.1" "docker.io/library/php:8.1.34-fpm-bookworm"
     "8.0" "docker.io/library/php:8.0.30-fpm-bullseye"
     "7.4" "docker.io/library/php:7.4.33-fpm-bullseye"
