@@ -104,7 +104,7 @@ echo "Starting UI build with Node..."
             buildah from --name nodebuilder-webserver -v "${PWD}:/usr/src:Z" docker.io/library/node:24-slim
         fi
         buildah run --env="NODE_OPTIONS=--openssl-legacy-provider" nodebuilder-webserver \
-            sh -c "cd /usr/src/ui && yarn install && yarn build" 2>&1 | sed -u "s/^/[node] /"
+            sh -c "cd /usr/src/ui && corepack enable && yarn install && yarn build" 2>&1 | sed -u "s/^/[node] /"
         exit "${PIPESTATUS[0]}"
     ) &
     build_pid=$!
