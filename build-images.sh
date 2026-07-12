@@ -14,7 +14,7 @@ reponame="webserver"
 
 # PHP versions to build: "version" "base-image" (pairs)
 declare -a PHP_VERSIONS=(
-    "8.5" "docker.io/library/php:8.5.7-fpm-bookworm"
+    "8.5" "docker.io/library/php:8.5.8-fpm-bookworm"
     "8.4" "docker.io/library/php:8.4.23-fpm-bookworm"
     "8.3" "docker.io/library/php:8.3.32-fpm-bookworm"
     "8.2" "docker.io/library/php:8.2.32-fpm-bookworm"
