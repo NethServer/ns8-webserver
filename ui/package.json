@@ -41,5 +41,9 @@
     "sass-loader": "^10.1.1",
     "vue-template-compiler": "^2.6.11"
   },
+  "resolutions": {
+    "carbon-components": "10.58.15",
+    "@carbon/icon-helpers": "10.76.0"
+  },
   "packageManager": "yarn@4.17.1"
 }
