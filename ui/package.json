@@ -14,7 +14,7 @@
     "@carbon/vue": "^2.40.0",
     "@nethserver/ns8-ui-lib": "^1.12.2",
     "await-to-js": "^3.0.0",
-    "axios": "^0.33.0",
+    "axios": "^0.32.0",
     "carbon-components": "^10.41.0",
     "core-js": "^3.6.5",
     "lottie-web-vue": "^1.2.0",
@@ -41,5 +41,5 @@
     "sass-loader": "^10.1.1",
     "vue-template-compiler": "^2.6.11"
   },
-  "packageManager": "yarn@4.17.1"
+  "packageManager": "yarn@4.17.0"
 }
