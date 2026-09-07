@@ -406,6 +406,39 @@ SMTP_ENCRYPTION=none
 SMTP_TLSVERIFY=
 ```
 
+## Custom Debian packages
+
+Each PHP container can install extra Debian packages at start, listed in a file of the module
+state directory: `php<version>-fpm-packages.list`. The file is created empty on the first start
+of the container.
+
+Edit it as the module user:
+
+    runagent -m webserver1
+    echo ffmpeg >> php8.3-fpm-packages.list
+
+Apply the change by restarting the PHP container:
+
+    systemctl --user restart phpfpm@8.3.service
+
+The installation runs in a dedicated unit, `phpfpm-packages@8.3.service`, started after the
+container. Read its output with:
+
+    journalctl --user -u phpfpm-packages@8.3.service
+
+One package name per line, lines starting with `#` are ignored. A name that is not a valid
+Debian package name is skipped and logged. When the installation fails, the unit fails but the
+PHP container keeps running and the websites keep being served.
+
+Notes:
+
+- The container is recreated at each start, so the packages are downloaded and installed again
+  every time the service starts. The node needs network access to the Debian mirrors.
+- Package names depend on the Debian release of the image: bullseye for PHP 7.4 and 8.0,
+  bookworm for the other versions.
+- A PHP extension shipped by a Debian package is not enabled automatically:
+  `docker-php-ext-enable` is not run.
+
 ## Uninstall
 
 To uninstall the instance:
