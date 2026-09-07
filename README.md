@@ -437,15 +437,19 @@ of `phpfpm@8.1.service` and the manual changes are dropped.
     runagent -m webserver1
     printf 'libyaml-dev\n' >> php8.1-fpm-packages.list
     printf 'yaml\nredis\n' >> php8.1-fpm-pecl.list
-    systemctl --user restart phpfpm@8.1.service
+    systemctl --user start phpfpm-packages@8.1.service
 
-The work runs in a dedicated unit, started after the container:
+The work runs in a dedicated unit, `phpfpm-packages@<version>.service`. It is started
+automatically after the container, and can be started by hand as above to apply the lists on the
+running container: no restart, no downtime. Read its output with:
 
     journalctl --user -u phpfpm-packages@8.1.service
 
-Nothing else is restarted. When the installation fails, that unit fails, the PHP container keeps
-running and the websites keep being served. Fix the list, then restart `phpfpm@8.1.service`
-again.
+When the installation fails, that unit fails, the PHP container keeps running and the websites
+keep being served. Fix the lists and start the unit again.
+
+Restarting `phpfpm@8.1.service` is only needed to drop something: the container keeps what is
+already installed until it is recreated.
 
 ### Notes
 
