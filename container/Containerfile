@@ -139,11 +139,13 @@ RUN set -eux \
     fi \
     \
     # --- Install imagick via PECL ---
-    && pecl install imagick \
-        || { \
-            echo 'PECL imagick install failed'; \
-            exit 11; \
-        } \
+    && { \
+        pecl install imagick \
+            || { \
+                echo 'PECL imagick install failed'; \
+                exit 11; \
+            }; \
+    } \
     && docker-php-ext-enable imagick \
     \
     # --- Cleanup build deps ---
