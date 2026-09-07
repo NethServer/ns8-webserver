@@ -64,6 +64,17 @@ ARG PHP_EXTENSIONS="\
 
 # --- Install build deps, compile PHP extensions ---
 RUN set -eux \
+    # Debian 11 is EOL: the bullseye-security index still lists packages that
+    # were purged from the pool, so apt install dies on a 404.
+    && if echo "$PHP_VERSION_IMAGE" | grep -q "bullseye$"; then \
+            printf '%s\n' \
+                "deb [check-valid-until=no] http://archive.debian.org/debian bullseye main" \
+                "deb [check-valid-until=no] http://snapshot.debian.org/archive/debian-security/20260801T000000Z bullseye-security main" \
+                > /etc/apt/sources.list; \
+            printf 'Acquire::Retries "5";\nAcquire::http::Timeout "60";\n' \
+                > /etc/apt/apt.conf.d/99-bullseye-eol; \
+        fi \
+    \
     # --- Install runtime libraries depending on Debian codename ---
     && apt update \
     && apt install -y ca-certificates openssl\
