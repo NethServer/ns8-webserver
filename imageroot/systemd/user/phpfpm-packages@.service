@@ -1,0 +1,12 @@
+[Unit]
+Description=Install custom Debian packages in php%i-fpm
+After=phpfpm@%i.service
+BindsTo=phpfpm@%i.service
+
+[Service]
+Type=oneshot
+EnvironmentFile=%E/state/environment
+WorkingDirectory=%E/state
+TimeoutStartSec=1800
+ExecStart=/usr/local/bin/runagent install-custom-packages %i
+SyslogIdentifier=php%i-fpm-packages

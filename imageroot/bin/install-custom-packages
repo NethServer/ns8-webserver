@@ -1,0 +1,55 @@
+#!/bin/bash
+
+#
+# Copyright (C) 2026 Nethesis S.r.l.
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+set -e
+
+version="${1:?We expect one argument}"
+container="php${version}-fpm"
+list="php${version}-fpm-packages.list"
+
+# The list is created at runtime, not shipped in imageroot/state: a module
+# update overwrites every file extracted from the image
+if [[ ! -f "${list}" ]]; then
+    cat > "${list}" <<'EOF'
+# Custom Debian packages installed in this PHP container.
+# One package name per line, lines starting with # are ignored.
+# The container is recreated at each start, so packages are installed again
+# every time: restart phpfpm@<version>.service to apply this file.
+EOF
+fi
+
+wanted=()
+while read -r name; do
+    # Reject anything that is not a package name, an apt option or a shell
+    # metacharacter would end up in the podman exec command line
+    if [[ "${name}" =~ ^[a-z0-9][a-z0-9+.-]*$ ]]; then
+        wanted+=("${name}")
+    else
+        echo "<3>Skipping invalid package name: ${name}"
+    fi
+done < <(sed -e 's/#.*//' -e 's/[[:space:]]//g' "${list}" | grep -v '^$')
+
+if [[ ${#wanted[@]} -eq 0 ]]; then
+    exit 0
+fi
+
+missing=()
+for name in "${wanted[@]}"; do
+    if ! podman exec "${container}" dpkg-query -W -f='${db:Status-Status}' "${name}" 2>/dev/null | grep -qx installed; then
+        missing+=("${name}")
+    fi
+done
+
+if [[ ${#missing[@]} -eq 0 ]]; then
+    exit 0
+fi
+
+echo "Installing custom packages in ${container}: ${missing[*]}"
+podman exec -e DEBIAN_FRONTEND=noninteractive "${container}" apt-get update -qq
+podman exec -e DEBIAN_FRONTEND=noninteractive "${container}" apt-get install -y --no-install-recommends -- "${missing[@]}"
+
+# A package can drop a .ini in conf.d, php-fpm reads it only at reload
+podman kill -s USR2 "${container}"
