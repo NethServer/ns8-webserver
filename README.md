@@ -406,38 +406,60 @@ SMTP_ENCRYPTION=none
 SMTP_TLSVERIFY=
 ```
 
-## Custom Debian packages
+## Custom Debian packages and PECL extensions
 
-Each PHP container can install extra Debian packages at start, listed in a file of the module
-state directory: `php<version>-fpm-packages.list`. The file is created empty on the first start
-of the container.
+Each PHP container can be extended at start with two files of the module state directory:
 
-Edit it as the module user:
+- `php<version>-fpm-packages.list` — Debian packages installed with `apt-get`
+- `php<version>-fpm-pecl.list` — PECL extensions built with `pecl` and enabled with
+  `docker-php-ext-enable`
+
+Both files are created empty on the first start of the container. One entry per line, lines
+starting with `#` are ignored. A PECL extension can be pinned as `name-version`, for example
+`redis-6.3.0`.
+
+### Test the installation by hand first
+
+A wrong package name aborts the whole `apt-get install`, so none of the other packages of the
+list is installed. Try the commands in the running container before writing the list:
+
+    podman exec -it php8.1-fpm bash
+    apt-get update
+    apt-get install -y --no-install-recommends libyaml-dev
+    pecl install yaml && docker-php-ext-enable yaml
+    php -m | grep yaml
+
+A build failure inside the container is harmless: the container is recreated at the next start
+of `phpfpm@8.1.service` and the manual changes are dropped.
+
+### Apply the lists
 
     runagent -m webserver1
-    echo ffmpeg >> php8.3-fpm-packages.list
+    printf 'libyaml-dev\n' >> php8.1-fpm-packages.list
+    printf 'yaml\nredis\n' >> php8.1-fpm-pecl.list
+    systemctl --user restart phpfpm@8.1.service
 
-Apply the change by restarting the PHP container:
+The work runs in a dedicated unit, started after the container:
 
-    systemctl --user restart phpfpm@8.3.service
+    journalctl --user -u phpfpm-packages@8.1.service
 
-The installation runs in a dedicated unit, `phpfpm-packages@8.3.service`, started after the
-container. Read its output with:
+Nothing else is restarted. When the installation fails, that unit fails, the PHP container keeps
+running and the websites keep being served. Fix the list, then restart `phpfpm@8.1.service`
+again.
 
-    journalctl --user -u phpfpm-packages@8.3.service
+### Notes
 
-One package name per line, lines starting with `#` are ignored. A name that is not a valid
-Debian package name is skipped and logged. When the installation fails, the unit fails but the
-PHP container keeps running and the websites keep being served.
-
-Notes:
-
-- The container is recreated at each start, so the packages are downloaded and installed again
-  every time the service starts. The node needs network access to the Debian mirrors.
+- The container is recreated at each start, so the packages and the extensions are installed
+  again every time the service starts. The node needs network access to the Debian mirrors and
+  to `pecl.php.net`. Count about 20 seconds for `libyaml-dev` plus the `yaml` and `redis`
+  extensions, much more for a big extension like `mongodb`.
 - Package names depend on the Debian release of the image: bullseye for PHP 7.4 and 8.0,
   bookworm for the other versions.
-- A PHP extension shipped by a Debian package is not enabled automatically:
-  `docker-php-ext-enable` is not run.
+- A `php-*` package of Debian is useless here: it targets the PHP of the distribution, while the
+  image runs its own PHP under `/usr/local`. Use the PECL list instead, and put the `-dev`
+  packages the build needs in the packages list.
+- The php-fpm master re-executes itself on `USR2` at the end of the installation, so a new
+  extension is served without restarting the container.
 
 ## Uninstall
 
