@@ -189,8 +189,7 @@ RUN set -eux \
     # 50 - Extension loaded but not working
     && { php /usr/local/bin/verify-runtime.php \
         || exit 50; \
-    } \
-    && rm -f /usr/local/bin/verify-runtime.php
+    }
     # --- Custom PHP configs ---
     COPY docker-php-ext-opcache.ini /usr/local/etc/php/conf.d/docker-php-ext-opcache.ini
     COPY docker-php-ext-imap.ini /usr/local/etc/php/conf.d/docker-php-ext-imap.ini

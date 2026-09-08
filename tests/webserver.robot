@@ -99,7 +99,7 @@ Create an extension probe to the 9001 vhost
 
 Check the expected PHP extensions are available to the vhost
     ${output} =    Execute Command    curl -H "Host: john.com" ${backend_url}/phpinfo.php
-    FOR    ${ext}    IN    gd    imagick    imap    intl    ldap    mysqli    pdo_mysql    pdo_pgsql    soap    tidy    xsl    zip
+    FOR    ${ext}    IN    bcmath    bz2    calendar    exif    ftp    gd    gmp    imagick    imap    intl    ldap    mysqli    pcntl    pdo_mysql    pdo_pgsql    pgsql    soap    sockets    tidy    xml    xsl    zip
         Should Contain    ${output}    module_${ext}
     END
 
@@ -110,6 +110,12 @@ Check the extension probe reports working extensions
     Should Contain    ${output}    mysql
     Should Contain    ${output}    pgsql
     Should Contain    ${output}    sqlite
+
+Check the runtime verification passes inside the container
+    ${output}  ${rc} =    Execute Command    runagent -m ${module_id} podman exec php7.4-fpm php /usr/local/bin/verify-runtime.php
+    ...    return_rc=True
+    Should Be Equal As Integers    ${rc}  0
+    Should Contain    ${output}    All runtime checks passed
 
 Check if vhost 9001 can use PHP80
     ${rc} =    Execute Command    api-cli run module/${module_id}/update-vhost --data '{"PhpVersion":"8.0","ServerNames":["foo.com","john.com"],"Port":9001,"MemoryLimit":2000,"AllowUrlfOpen":"enabled","UploadMaxFilesize":2000,"PostMaxSize":2000,"MaxExecutionTime":3600,"MaxFileUploads":20000,"lets_encrypt":true,"http2https":true,"Indexes":"enabled","status":"enabled"}'
