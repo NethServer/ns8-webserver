@@ -64,6 +64,8 @@ ARG PHP_EXTENSIONS="\
     zip \
 "
 
+COPY verify-runtime.php /usr/local/bin/verify-runtime.php
+
 # --- Install build deps, compile PHP extensions ---
 RUN set -eux \
     # Debian 11 is EOL: the bullseye-security index still lists packages that
@@ -164,7 +166,7 @@ RUN set -eux \
     # 40 - Missing runtime dependency for extension
     && for ext in $PHP_EXTENSIONS imap $PECL_EXTENSIONS; do \
         php -m \
-            | grep -qi "$ext" \
+            | grep -qix "$ext" \
             > /dev/null 2>&1 \
             || { \
                 echo "Missing PHP extension: $ext"; \
@@ -180,7 +182,15 @@ RUN set -eux \
             echo "Missing runtime dependency for ${ext}.so"; \
             exit 40; \
         fi; \
-    done
+    done \
+    \
+    # --- Verify the extensions are usable, not only loaded ---
+    # Exit code:
+    # 50 - Extension loaded but not working
+    && { php /usr/local/bin/verify-runtime.php \
+        || exit 50; \
+    } \
+    && rm -f /usr/local/bin/verify-runtime.php
     # --- Custom PHP configs ---
     COPY docker-php-ext-opcache.ini /usr/local/etc/php/conf.d/docker-php-ext-opcache.ini
     COPY docker-php-ext-imap.ini /usr/local/etc/php/conf.d/docker-php-ext-imap.ini
