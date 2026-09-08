@@ -173,3 +173,23 @@ RUN set -eux \
     # --- Custom PHP configs ---
     COPY docker-php-ext-opcache.ini /usr/local/etc/php/conf.d/docker-php-ext-opcache.ini
     COPY docker-php-ext-imap.ini /usr/local/etc/php/conf.d/docker-php-ext-imap.ini
+
+    # --- Check the image as it ships, with the ini files above in place ---
+    # The checks of the RUN above run before these COPY, so they never see what
+    # PHP loads at startup
+    # Exit code:
+    # 50 - PHP or php-fpm refuses to start, or an extension is not usable
+    RUN set -eux \
+        # PHP 8.5 has OPcache built in, the zend_extension line fails at every start
+        && if [ ! -f "$(php-config --extension-dir)/opcache.so" ]; then \
+            rm -f /usr/local/etc/php/conf.d/docker-php-ext-opcache.ini; \
+        fi \
+        && if php -v 2>&1 | grep -q 'Failed loading'; then \
+            php -v; \
+            echo 'PHP startup emits an error'; \
+            exit 50; \
+        fi \
+        && php-fpm --test \
+        && { php /usr/local/bin/verify-runtime.php \
+            || exit 50; \
+        }
