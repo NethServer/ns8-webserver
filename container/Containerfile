@@ -39,35 +39,15 @@ ARG PHP_BUILD_DEPS="\
     libmagick++-dev \
 "
 
-ARG PECL_EXTENSIONS="imagick"
-
-ARG PHP_EXTENSIONS="\
-    bcmath \
-    bz2 \
-    calendar \
-    exif \
-    ftp \
-    gd \
-    gmp \
-    intl \
-    ldap \
-    mysqli \
-    pcntl \
-    pdo_mysql \
-    pdo_pgsql \
-    pgsql \
-    soap \
-    sockets \
-    tidy \
-    xml \
-    xsl \
-    zip \
-"
-
 COPY verify-runtime.php /usr/local/bin/verify-runtime.php
+COPY php-extensions.list pecl-extensions.list /usr/local/share/
 
 # --- Install build deps, compile PHP extensions ---
+# The extension lists shipped above are the single source of truth, shared with
+# verify-runtime.php and with the test suite
 RUN set -eux \
+    && PHP_EXTENSIONS="$(sed -e 's/#.*//' /usr/local/share/php-extensions.list | xargs)" \
+    && PECL_EXTENSIONS="$(sed -e 's/#.*//' /usr/local/share/pecl-extensions.list | xargs)" \
     # Debian 11 is EOL: the bullseye-security index still lists packages that
     # were purged from the pool, so apt install dies on a 404.
     && if echo "$PHP_VERSION_IMAGE" | grep -q "bullseye$"; then \
@@ -164,7 +144,7 @@ RUN set -eux \
     # 20 - Missing PHP extension
     # 30 - Missing .so file for extension
     # 40 - Missing runtime dependency for extension
-    && for ext in $PHP_EXTENSIONS imap $PECL_EXTENSIONS; do \
+    && for ext in $PHP_EXTENSIONS $PECL_EXTENSIONS; do \
         php -m \
             | grep -qix "$ext" \
             > /dev/null 2>&1 \

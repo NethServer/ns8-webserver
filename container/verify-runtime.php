@@ -4,9 +4,18 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  *
  * Loaded is not usable: php -m lists gd whether or not it was built with
- * WebP, and lists pdo_mysql whether or not the driver registered. Each check
- * returns true or the message to print.
+ * WebP, and lists pdo_mysql whether or not the driver registered.
+ *
+ * The extension lists shipped with the image drive the build and this check.
+ * Every listed extension needs an entry below, extra entries are allowed for
+ * what the lists cannot carry: imap is built differently per PHP version, and
+ * OPcache comes from the base image.
+ *
+ * Each entry returns true, or the message to print.
  */
+
+const LIST_DIR = '/usr/local/share';
+const LISTS = ['php-extensions.list', 'pecl-extensions.list'];
 
 $checks = [
     'bcmath' => fn() => function_exists('bcadd'),
@@ -45,13 +54,50 @@ $checks = [
         return $missing ? 'imagick handles no ' . implode(', ', $missing) : true;
     },
 
-    'pdo' => function () {
-        $missing = array_diff(['mysql', 'pgsql', 'sqlite'], PDO::getAvailableDrivers());
-        return $missing ? 'PDO has no driver for ' . implode(', ', $missing) : true;
-    },
+    'pdo_mysql' => fn() => in_array('mysql', PDO::getAvailableDrivers(), true),
+    'pdo_pgsql' => fn() => in_array('pgsql', PDO::getAvailableDrivers(), true),
+    'pdo_sqlite' => fn() => in_array('sqlite', PDO::getAvailableDrivers(), true),
 ];
 
+function read_lists(): array
+{
+    $names = [];
+
+    foreach (LISTS as $file) {
+        $path = LIST_DIR . '/' . $file;
+        $lines = @file($path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+        if ($lines === false) {
+            echo "Cannot read {$path}", PHP_EOL;
+            exit(1);
+        }
+        foreach ($lines as $line) {
+            $name = trim(preg_replace('/#.*/', '', $line));
+            if ($name !== '') {
+                $names[] = $name;
+            }
+        }
+    }
+
+    return $names;
+}
+
+$listed = read_lists();
+
+// An extension added to a list without its check would ship untested
+$unchecked = array_diff($listed, array_keys($checks));
+if ($unchecked) {
+    echo 'No runtime check for: ' . implode(', ', $unchecked), PHP_EOL;
+    exit(1);
+}
+
 $failed = 0;
+
+foreach ($listed as $name) {
+    if (!extension_loaded($name)) {
+        echo "Extension not loaded: {$name}", PHP_EOL;
+        $failed++;
+    }
+}
 
 foreach ($checks as $name => $check) {
     $result = $check();
