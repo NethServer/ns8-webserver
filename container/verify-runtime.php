@@ -24,6 +24,7 @@ $checks = [
     'exif' => fn() => function_exists('exif_read_data'),
     'ftp' => fn() => function_exists('ftp_connect'),
     'gmp' => fn() => function_exists('gmp_add'),
+    'gettext' => fn() => function_exists('gettext'),
     'imap' => fn() => function_exists('imap_open'),
     'intl' => fn() => class_exists('Collator'),
     'ldap' => fn() => function_exists('ldap_connect'),
@@ -52,6 +53,52 @@ $checks = [
     'imagick' => function () {
         $missing = array_diff(['PNG', 'JPEG', 'GIF', 'WEBP'], Imagick::queryFormats());
         return $missing ? 'imagick handles no ' . implode(', ', $missing) : true;
+    },
+
+    'apcu' => function () {
+        // The cache is off for the CLI unless apc.enable_cli is set, and storing
+        // is what proves the extension works, so the build passes that option
+        if (!apcu_enabled()) {
+            return function_exists('apcu_store') ? true : 'apcu has no function';
+        }
+        return apcu_store('verify', 'runtime') && apcu_fetch('verify') === 'runtime'
+            ? true
+            : 'apcu does not store and fetch a value';
+    },
+
+    'igbinary' => fn() => igbinary_unserialize(igbinary_serialize(['x' => 1])) === ['x' => 1]
+        ? true
+        : 'igbinary does not round-trip a value',
+
+    'redis' => function () {
+        if (!class_exists('Redis')) {
+            return 'the Redis class is missing';
+        }
+        // A redis built before igbinary loses the serializer without a word
+        return defined('Redis::SERIALIZER_IGBINARY') ? true : 'redis has no igbinary serializer';
+    },
+
+    // Not an extension: applications rasterizing PDF shell out to it
+    'ghostscript' => function () {
+        $probe = sys_get_temp_dir() . '/verify-runtime.ps';
+        $page = sys_get_temp_dir() . '/verify-runtime.png';
+        $postscript = "%!PS\n/Helvetica findfont 12 scalefont setfont 10 10 moveto (ns8) show showpage\n";
+
+        if (file_put_contents($probe, $postscript) === false) {
+            return true;
+        }
+
+        exec(
+            'gs -q -dNOPAUSE -dBATCH -dSAFER -sDEVICE=png16m -sOutputFile='
+                . escapeshellarg($page) . ' ' . escapeshellarg($probe) . ' 2>&1',
+            $output,
+            $status
+        );
+        $rendered = $status === 0 && file_exists($page) && filesize($page) > 0;
+        @unlink($probe);
+        @unlink($page);
+
+        return $rendered ? true : 'ghostscript cannot render a page';
     },
 
     'pdo_mysql' => fn() => in_array('mysql', PDO::getAvailableDrivers(), true),

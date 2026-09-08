@@ -1,3 +1,6 @@
 # Extensions built with pecl install, in build order.
 # Every name here needs a check in verify-runtime.php, the build fails otherwise.
 imagick
+igbinary
+apcu
+redis

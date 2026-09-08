@@ -61,7 +61,7 @@ RUN set -eux \
     \
     # --- Install runtime libraries depending on Debian codename ---
     && apt update \
-    && apt install -y ca-certificates openssl\
+    && apt install -y ca-certificates openssl ghostscript\
     &&  if echo "$PHP_VERSION_IMAGE" | grep -q "bullseye$"; then \
             apt install -y --no-install-recommends \
                 libc-client2007e \
@@ -123,12 +123,22 @@ RUN set -eux \
     fi \
     \
     # --- Install the PECL extensions ---
+    # PEAR needs the inner quotes of the redis option: without them it is
+    # ignored on PHP 7.4 and crashes the builder on PHP 8.5
     && for ext in $PECL_EXTENSIONS; do \
-        pecl install "$ext" \
-            || { \
-                echo "PECL $ext install failed"; \
-                exit 11; \
-            }; \
+        if [ "$ext" = "redis" ]; then \
+            pecl install --configureoptions 'enable-redis-igbinary="yes"' redis \
+                || { \
+                    echo 'PECL redis install failed'; \
+                    exit 11; \
+                }; \
+        else \
+            pecl install "$ext" \
+                || { \
+                    echo "PECL $ext install failed"; \
+                    exit 11; \
+                }; \
+        fi; \
         docker-php-ext-enable "$ext"; \
     done \
     \
@@ -167,7 +177,7 @@ RUN set -eux \
     # --- Verify the extensions are usable, not only loaded ---
     # Exit code:
     # 50 - Extension loaded but not working
-    && { php /usr/local/bin/verify-runtime.php \
+    && { php -d apc.enable_cli=1 /usr/local/bin/verify-runtime.php \
         || exit 50; \
     }
     # --- Custom PHP configs ---
@@ -190,6 +200,6 @@ RUN set -eux \
             exit 50; \
         fi \
         && php-fpm --test \
-        && { php /usr/local/bin/verify-runtime.php \
+        && { php -d apc.enable_cli=1 /usr/local/bin/verify-runtime.php \
             || exit 50; \
         }

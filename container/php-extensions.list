@@ -8,6 +8,7 @@ calendar
 exif
 ftp
 gd
+gettext
 gmp
 intl
 ldap
