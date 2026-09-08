@@ -92,29 +92,14 @@ Check if phpinfo.php uses PHP 7.4 with the custom settings
     Should Contain    ${output}    <tr><td class="e">max_execution_time</td><td class="v">3600</td><td class="v">3600</td></tr>
     Should Contain    ${output}    <tr><td class="e">max_file_uploads</td><td class="v">20000</td><td class="v">20000</td></tr>
 
-Create an extension probe to the 9001 vhost
-    ${output}  ${rc} =    Execute Command    echo '<?php $i = gd_info(); echo "gdwebp=", (int) $i["WebP Support"], " pdo=", implode(",", PDO::getAvailableDrivers()), " imagickwebp=", (int) in_array("WEBP", Imagick::queryFormats()), PHP_EOL;' > /home/${module_id}/.local/share/containers/storage/volumes/websites/_data/9001/extcheck.php
+Create a runtime check probe to the 9001 vhost
+    # The image carries the extension lists and their checks, the suite keeps no list
+    ${output}  ${rc} =    Execute Command    echo '<?php require "/usr/local/bin/verify-runtime.php";' > /home/${module_id}/.local/share/containers/storage/volumes/websites/_data/9001/verify.php
     ...    return_rc=True
     Should Be Equal As Integers    ${rc}  0
 
-Check the expected PHP extensions are available to the vhost
-    ${output} =    Execute Command    curl -H "Host: john.com" ${backend_url}/phpinfo.php
-    FOR    ${ext}    IN    bcmath    bz2    calendar    exif    ftp    gd    gmp    imagick    imap    intl    ldap    mysqli    pcntl    pdo_mysql    pdo_pgsql    pgsql    soap    sockets    tidy    xml    xsl    zip
-        Should Contain    ${output}    module_${ext}
-    END
-
-Check the extension probe reports working extensions
-    ${output} =    Execute Command    curl -H "Host: john.com" ${backend_url}/extcheck.php
-    Should Contain    ${output}    gdwebp=1
-    Should Contain    ${output}    imagickwebp=1
-    Should Contain    ${output}    mysql
-    Should Contain    ${output}    pgsql
-    Should Contain    ${output}    sqlite
-
-Check the runtime verification passes inside the container
-    ${output}  ${rc} =    Execute Command    runagent -m ${module_id} podman exec php7.4-fpm php /usr/local/bin/verify-runtime.php
-    ...    return_rc=True
-    Should Be Equal As Integers    ${rc}  0
+Check the vhost passes the runtime verification through php-fpm
+    ${output} =    Execute Command    curl -H "Host: john.com" ${backend_url}/verify.php
     Should Contain    ${output}    All runtime checks passed
 
 Check if vhost 9001 can use PHP80
