@@ -406,6 +406,55 @@ SMTP_ENCRYPTION=none
 SMTP_TLSVERIFY=
 ```
 
+## PHP extensions
+
+The extensions of the PHP images are declared in two files, and nowhere else:
+
+- `container/php-extensions.list` — built with `docker-php-ext-install`
+- `container/pecl-extensions.list` — built with `pecl install`, in build order
+
+The build reads them to install the extensions and to check they are loaded.
+`container/verify-runtime.php`, shipped in the image, reads the same files.
+
+### Adding an extension
+
+Add its name to the right list, and add its check to `verify-runtime.php`. The check is not
+optional: the build fails with `No runtime check for: <name>` when a listed extension has none,
+because `php -m` proves nothing. It lists `gd` whether or not it was built with WebP, and
+`pdo_mysql` whether or not the driver registered.
+
+A check returns `true`, or the message to print:
+
+    'zip' => fn() => class_exists('ZipArchive'),
+
+A build dependency goes to `PHP_BUILD_DEPS` in the `Containerfile`, a runtime library to the
+`apt install` list of the matching Debian release — bullseye for PHP 7.4 and 8.0, bookworm for
+the others.
+
+`imap` and OPcache are checked without being listed: `imap` is built from source or from PECL
+depending on the PHP version, and OPcache comes from the base image. Extra checks are allowed,
+a listed extension without a check is not.
+
+### What the build fails on
+
+| Exit code | Meaning |
+| --- | --- |
+| 10, 11 | `imap` or a PECL extension failed to build |
+| 20 | extension missing from `php -m` |
+| 30 | missing `.so` file |
+| 40 | a shared library of the `.so` is not found |
+| 50 | extension loaded but not usable, or a listed extension with no check |
+
+### Checking a running instance
+
+The same checks run on demand, against the container of one PHP version:
+
+    runagent -m webserver1 podman exec php8.3-fpm php /usr/local/bin/verify-runtime.php
+
+It prints `All runtime checks passed` followed by the list, or one line per failure and a
+non-zero exit code. `tests/webserver.robot` calls it for every PHP version, and also serves it
+through nginx and php-fpm, so the whole chain is covered.
+
 ## Uninstall
 
 To uninstall the instance:
