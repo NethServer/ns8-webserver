@@ -102,6 +102,13 @@ Check the vhost passes the runtime verification through php-fpm
     ${output} =    Execute Command    curl -H "Host: john.com" ${backend_url}/verify.php
     Should Contain    ${output}    All runtime checks passed
 
+Check the runtime verification passes from the command line
+    # The command documented in the README, for diagnosing a live instance
+    ${output}  ${rc} =    Execute Command    runagent -m ${module_id} podman exec php7.4-fpm php /usr/local/bin/verify-runtime.php
+    ...    return_rc=True
+    Should Be Equal As Integers    ${rc}  0
+    Should Contain    ${output}    All runtime checks passed
+
 Check if vhost 9001 can use PHP80
     ${rc} =    Execute Command    api-cli run module/${module_id}/update-vhost --data '{"PhpVersion":"8.0","ServerNames":["foo.com","john.com"],"Port":9001,"MemoryLimit":2000,"AllowUrlfOpen":"enabled","UploadMaxFilesize":2000,"PostMaxSize":2000,"MaxExecutionTime":3600,"MaxFileUploads":20000,"lets_encrypt":true,"http2https":true,"Indexes":"enabled","status":"enabled"}'
     ...    return_rc=True  return_stdout=False
