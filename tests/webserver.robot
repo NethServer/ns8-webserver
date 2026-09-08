@@ -92,6 +92,25 @@ Check if phpinfo.php uses PHP 7.4 with the custom settings
     Should Contain    ${output}    <tr><td class="e">max_execution_time</td><td class="v">3600</td><td class="v">3600</td></tr>
     Should Contain    ${output}    <tr><td class="e">max_file_uploads</td><td class="v">20000</td><td class="v">20000</td></tr>
 
+Create an extension probe to the 9001 vhost
+    ${output}  ${rc} =    Execute Command    echo '<?php $i = gd_info(); echo "gdwebp=", (int) $i["WebP Support"], " pdo=", implode(",", PDO::getAvailableDrivers()), " imagickwebp=", (int) in_array("WEBP", Imagick::queryFormats()), PHP_EOL;' > /home/${module_id}/.local/share/containers/storage/volumes/websites/_data/9001/extcheck.php
+    ...    return_rc=True
+    Should Be Equal As Integers    ${rc}  0
+
+Check the expected PHP extensions are available to the vhost
+    ${output} =    Execute Command    curl -H "Host: john.com" ${backend_url}/phpinfo.php
+    FOR    ${ext}    IN    gd    imagick    imap    intl    ldap    mysqli    pdo_mysql    pdo_pgsql    soap    tidy    xsl    zip
+        Should Contain    ${output}    module_${ext}
+    END
+
+Check the extension probe reports working extensions
+    ${output} =    Execute Command    curl -H "Host: john.com" ${backend_url}/extcheck.php
+    Should Contain    ${output}    gdwebp=1
+    Should Contain    ${output}    imagickwebp=1
+    Should Contain    ${output}    mysql
+    Should Contain    ${output}    pgsql
+    Should Contain    ${output}    sqlite
+
 Check if vhost 9001 can use PHP80
     ${rc} =    Execute Command    api-cli run module/${module_id}/update-vhost --data '{"PhpVersion":"8.0","ServerNames":["foo.com","john.com"],"Port":9001,"MemoryLimit":2000,"AllowUrlfOpen":"enabled","UploadMaxFilesize":2000,"PostMaxSize":2000,"MaxExecutionTime":3600,"MaxFileUploads":20000,"lets_encrypt":true,"http2https":true,"Indexes":"enabled","status":"enabled"}'
     ...    return_rc=True  return_stdout=False
