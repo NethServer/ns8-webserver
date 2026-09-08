@@ -39,31 +39,26 @@ ARG PHP_BUILD_DEPS="\
     libmagick++-dev \
 "
 
-ARG PHP_EXTENSIONS="\
-    bcmath \
-    bz2 \
-    calendar \
-    exif \
-    ftp \
-    gd \
-    gmp \
-    intl \
-    ldap \
-    mysqli \
-    pcntl \
-    pdo_mysql \
-    pdo_pgsql \
-    pgsql \
-    soap \
-    sockets \
-    tidy \
-    xml \
-    xsl \
-    zip \
-"
+COPY verify-runtime.php /usr/local/bin/verify-runtime.php
+COPY php-extensions.list pecl-extensions.list /usr/local/share/
 
 # --- Install build deps, compile PHP extensions ---
+# The extension lists shipped above are the single source of truth, shared with
+# verify-runtime.php and with the test suite
 RUN set -eux \
+    && PHP_EXTENSIONS="$(sed -e 's/#.*//' /usr/local/share/php-extensions.list | xargs)" \
+    && PECL_EXTENSIONS="$(sed -e 's/#.*//' /usr/local/share/pecl-extensions.list | xargs)" \
+    # Debian 11 is EOL: the bullseye-security index still lists packages that
+    # were purged from the pool, so apt install dies on a 404.
+    && if echo "$PHP_VERSION_IMAGE" | grep -q "bullseye$"; then \
+            printf '%s\n' \
+                "deb [check-valid-until=no] http://archive.debian.org/debian bullseye main" \
+                "deb [check-valid-until=no] http://snapshot.debian.org/archive/debian-security/20260801T000000Z bullseye-security main" \
+                > /etc/apt/sources.list; \
+            printf 'Acquire::Retries "5";\nAcquire::http::Timeout "60";\n' \
+                > /etc/apt/apt.conf.d/99-bullseye-eol; \
+        fi \
+    \
     # --- Install runtime libraries depending on Debian codename ---
     && apt update \
     && apt install -y ca-certificates openssl\
@@ -127,13 +122,15 @@ RUN set -eux \
         docker-php-ext-enable imap; \
     fi \
     \
-    # --- Install imagick via PECL ---
-    && pecl install imagick \
-        || { \
-            echo 'PECL imagick install failed'; \
-            exit 11; \
-        } \
-    && docker-php-ext-enable imagick \
+    # --- Install the PECL extensions ---
+    && for ext in $PECL_EXTENSIONS; do \
+        pecl install "$ext" \
+            || { \
+                echo "PECL $ext install failed"; \
+                exit 11; \
+            }; \
+        docker-php-ext-enable "$ext"; \
+    done \
     \
     # --- Cleanup build deps ---
     && apt purge -y $PHP_BUILD_DEPS \
@@ -147,9 +144,9 @@ RUN set -eux \
     # 20 - Missing PHP extension
     # 30 - Missing .so file for extension
     # 40 - Missing runtime dependency for extension
-    && for ext in $PHP_EXTENSIONS imap imagick; do \
+    && for ext in $PHP_EXTENSIONS $PECL_EXTENSIONS; do \
         php -m \
-            | grep -qi "$ext" \
+            | grep -qix "$ext" \
             > /dev/null 2>&1 \
             || { \
                 echo "Missing PHP extension: $ext"; \
@@ -165,7 +162,34 @@ RUN set -eux \
             echo "Missing runtime dependency for ${ext}.so"; \
             exit 40; \
         fi; \
-    done
+    done \
+    \
+    # --- Verify the extensions are usable, not only loaded ---
+    # Exit code:
+    # 50 - Extension loaded but not working
+    && { php /usr/local/bin/verify-runtime.php \
+        || exit 50; \
+    }
     # --- Custom PHP configs ---
     COPY docker-php-ext-opcache.ini /usr/local/etc/php/conf.d/docker-php-ext-opcache.ini
     COPY docker-php-ext-imap.ini /usr/local/etc/php/conf.d/docker-php-ext-imap.ini
+
+    # --- Check the image as it ships, with the ini files above in place ---
+    # The checks of the RUN above run before these COPY, so they never see what
+    # PHP loads at startup
+    # Exit code:
+    # 50 - PHP or php-fpm refuses to start, or an extension is not usable
+    RUN set -eux \
+        # PHP 8.5 has OPcache built in, the zend_extension line fails at every start
+        && if [ ! -f "$(php-config --extension-dir)/opcache.so" ]; then \
+            rm -f /usr/local/etc/php/conf.d/docker-php-ext-opcache.ini; \
+        fi \
+        && if php -v 2>&1 | grep -q 'Failed loading'; then \
+            php -v; \
+            echo 'PHP startup emits an error'; \
+            exit 50; \
+        fi \
+        && php-fpm --test \
+        && { php /usr/local/bin/verify-runtime.php \
+            || exit 50; \
+        }

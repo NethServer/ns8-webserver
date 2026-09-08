@@ -1,0 +1,24 @@
+# Extensions built with docker-php-ext-install.
+# Every name here needs a check in verify-runtime.php, the build fails otherwise.
+# imap is not here: it is built from source or from PECL depending on the PHP
+# version, see the Containerfile.
+bcmath
+bz2
+calendar
+exif
+ftp
+gd
+gmp
+intl
+ldap
+mysqli
+pcntl
+pdo_mysql
+pdo_pgsql
+pgsql
+soap
+sockets
+tidy
+xml
+xsl
+zip
