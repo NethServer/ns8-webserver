@@ -22,6 +22,16 @@ VirtualHost john.com URL is reachable
     ...    return_rc=True  return_stdout=False
     Should Be Equal As Integers    ${rc}  0
 
+Runtime checks pass for PHP
+    [Arguments]    ${version}
+    # The image owns the extension lists and their checks, the suite keeps no list
+    ${output} =    Execute Command    curl -H "Host: john.com" ${backend_url}/verify.php
+    Should Contain    ${output}    All runtime checks passed
+    ${output}  ${rc} =    Execute Command    runagent -m ${module_id} podman exec php${version}-fpm php /usr/local/bin/verify-runtime.php
+    ...    return_rc=True
+    Should Be Equal As Integers    ${rc}  0
+    Should Contain    ${output}    All runtime checks passed
+
 *** Test Cases ***
 Check if webserver is installed correctly
     ${output}  ${rc} =    Execute Command    add-module ${IMAGE_URL} 1
@@ -74,6 +84,11 @@ Create a phpinfo to the 9001 vhost
     ...    return_rc=True
     Should Be Equal As Integers    ${rc}  0
 
+Create a runtime check probe to the 9001 vhost
+    ${output}  ${rc} =    Execute Command    echo '<?php require "/usr/local/bin/verify-runtime.php";' > /home/${module_id}/.local/share/containers/storage/volumes/websites/_data/9001/verify.php
+    ...    return_rc=True
+    Should Be Equal As Integers    ${rc}  0
+
 Check if vhost 9001 can use PHP74
     ${rc} =    Execute Command    api-cli run module/${module_id}/update-vhost --data '{"PhpVersion":"7.4","ServerNames":["foo.com","john.com"],"Port":9001,"MemoryLimit":2000,"AllowUrlfOpen":"enabled","UploadMaxFilesize":2000,"PostMaxSize":2000,"MaxExecutionTime":3600,"MaxFileUploads":20000,"lets_encrypt":true,"http2https":true,"Indexes":"enabled","status":"enabled"}'
     ...    return_rc=True  return_stdout=False
@@ -92,22 +107,8 @@ Check if phpinfo.php uses PHP 7.4 with the custom settings
     Should Contain    ${output}    <tr><td class="e">max_execution_time</td><td class="v">3600</td><td class="v">3600</td></tr>
     Should Contain    ${output}    <tr><td class="e">max_file_uploads</td><td class="v">20000</td><td class="v">20000</td></tr>
 
-Create a runtime check probe to the 9001 vhost
-    # The image carries the extension lists and their checks, the suite keeps no list
-    ${output}  ${rc} =    Execute Command    echo '<?php require "/usr/local/bin/verify-runtime.php";' > /home/${module_id}/.local/share/containers/storage/volumes/websites/_data/9001/verify.php
-    ...    return_rc=True
-    Should Be Equal As Integers    ${rc}  0
-
-Check the vhost passes the runtime verification through php-fpm
-    ${output} =    Execute Command    curl -H "Host: john.com" ${backend_url}/verify.php
-    Should Contain    ${output}    All runtime checks passed
-
-Check the runtime verification passes from the command line
-    # The command documented in the README, for diagnosing a live instance
-    ${output}  ${rc} =    Execute Command    runagent -m ${module_id} podman exec php7.4-fpm php /usr/local/bin/verify-runtime.php
-    ...    return_rc=True
-    Should Be Equal As Integers    ${rc}  0
-    Should Contain    ${output}    All runtime checks passed
+Check the runtime verification passes for PHP 7.4
+    Runtime checks pass for PHP    7.4
 
 Check if vhost 9001 can use PHP80
     ${rc} =    Execute Command    api-cli run module/${module_id}/update-vhost --data '{"PhpVersion":"8.0","ServerNames":["foo.com","john.com"],"Port":9001,"MemoryLimit":2000,"AllowUrlfOpen":"enabled","UploadMaxFilesize":2000,"PostMaxSize":2000,"MaxExecutionTime":3600,"MaxFileUploads":20000,"lets_encrypt":true,"http2https":true,"Indexes":"enabled","status":"enabled"}'
@@ -127,6 +128,9 @@ Check if phpinfo.php uses PHP 8.0 with the custom settings
     Should Contain    ${output}    <tr><td class="e">max_execution_time</td><td class="v">3600</td><td class="v">3600</td></tr>
     Should Contain    ${output}    <tr><td class="e">max_file_uploads</td><td class="v">20000</td><td class="v">20000</td></tr>
 
+Check the runtime verification passes for PHP 8.0
+    Runtime checks pass for PHP    8.0
+
 Check if vhost 9001 can use PHP81
     ${rc} =    Execute Command    api-cli run module/${module_id}/update-vhost --data '{"PhpVersion":"8.1","ServerNames":["foo.com","john.com"],"Port":9001,"MemoryLimit":2000,"AllowUrlfOpen":"enabled","UploadMaxFilesize":2000,"PostMaxSize":2000,"MaxExecutionTime":3600,"MaxFileUploads":20000,"lets_encrypt":true,"http2https":true,"Indexes":"enabled","status":"enabled"}'
     ...    return_rc=True  return_stdout=False
@@ -144,6 +148,9 @@ Check if phpinfo.php uses PHP 8.1 with the custom settings
     Should Contain    ${output}    <tr><td class="e">post_max_size</td><td class="v">2000M</td><td class="v">2000M</td></tr>
     Should Contain    ${output}    <tr><td class="e">max_execution_time</td><td class="v">3600</td><td class="v">3600</td></tr>
     Should Contain    ${output}    <tr><td class="e">max_file_uploads</td><td class="v">20000</td><td class="v">20000</td></tr>
+
+Check the runtime verification passes for PHP 8.1
+    Runtime checks pass for PHP    8.1
 
 Check if vhost 9001 can use PHP82
     ${rc} =    Execute Command    api-cli run module/${module_id}/update-vhost --data '{"PhpVersion":"8.2","ServerNames":["foo.com","john.com"],"Port":9001,"MemoryLimit":2000,"AllowUrlfOpen":"enabled","UploadMaxFilesize":2000,"PostMaxSize":2000,"MaxExecutionTime":3600,"MaxFileUploads":20000,"lets_encrypt":true,"http2https":true,"Indexes":"enabled","status":"enabled"}'
@@ -163,6 +170,9 @@ Check if phpinfo.php uses PHP 8.2 with the custom settings
     Should Contain    ${output}    <tr><td class="e">max_execution_time</td><td class="v">3600</td><td class="v">3600</td></tr>
     Should Contain    ${output}    <tr><td class="e">max_file_uploads</td><td class="v">20000</td><td class="v">20000</td></tr>
 
+Check the runtime verification passes for PHP 8.2
+    Runtime checks pass for PHP    8.2
+
 Check if vhost 9001 can use PHP83
     ${rc} =    Execute Command    api-cli run module/${module_id}/update-vhost --data '{"PhpVersion":"8.3","ServerNames":["foo.com","john.com"],"Port":9001,"MemoryLimit":2000,"AllowUrlfOpen":"enabled","UploadMaxFilesize":2000,"PostMaxSize":2000,"MaxExecutionTime":3600,"MaxFileUploads":20000,"lets_encrypt":true,"http2https":true,"Indexes":"enabled","status":"enabled"}'
     ...    return_rc=True  return_stdout=False
@@ -180,6 +190,9 @@ Check if phpinfo.php uses PHP 8.3 with the custom settings
     Should Contain    ${output}    <tr><td class="e">post_max_size</td><td class="v">2000M</td><td class="v">2000M</td></tr>
     Should Contain    ${output}    <tr><td class="e">max_execution_time</td><td class="v">3600</td><td class="v">3600</td></tr>
     Should Contain    ${output}    <tr><td class="e">max_file_uploads</td><td class="v">20000</td><td class="v">20000</td></tr>
+
+Check the runtime verification passes for PHP 8.3
+    Runtime checks pass for PHP    8.3
 
 Check if vhost 9001 can use PHP84
     ${rc} =    Execute Command    api-cli run module/${module_id}/update-vhost --data '{"PhpVersion":"8.4","ServerNames":["foo.com","john.com"],"Port":9001,"MemoryLimit":2000,"AllowUrlfOpen":"enabled","UploadMaxFilesize":2000,"PostMaxSize":2000,"MaxExecutionTime":3600,"MaxFileUploads":20000,"lets_encrypt":true,"http2https":true,"Indexes":"enabled","status":"enabled"}'
@@ -199,6 +212,9 @@ Check if phpinfo.php uses PHP 8.4 with the custom settings
     Should Contain    ${output}    <tr><td class="e">max_execution_time</td><td class="v">3600</td><td class="v">3600</td></tr>
     Should Contain    ${output}    <tr><td class="e">max_file_uploads</td><td class="v">20000</td><td class="v">20000</td></tr>
 
+Check the runtime verification passes for PHP 8.4
+    Runtime checks pass for PHP    8.4
+
 Check if vhost 9001 can use PHP85
     ${rc} =    Execute Command    api-cli run module/${module_id}/update-vhost --data '{"PhpVersion":"8.5","ServerNames":["foo.com","john.com"],"Port":9001,"MemoryLimit":2000,"AllowUrlfOpen":"enabled","UploadMaxFilesize":2000,"PostMaxSize":2000,"MaxExecutionTime":3600,"MaxFileUploads":20000,"lets_encrypt":true,"http2https":true,"Indexes":"enabled","status":"enabled"}'
     ...    return_rc=True  return_stdout=False
@@ -216,6 +232,9 @@ Check if phpinfo.php uses PHP 8.5 with the custom settings
     Should Contain    ${output}    <tr><td class="e">post_max_size</td><td class="v">2000M</td><td class="v">2000M</td></tr>
     Should Contain    ${output}    <tr><td class="e">max_execution_time</td><td class="v">3600</td><td class="v">3600</td></tr>
     Should Contain    ${output}    <tr><td class="e">max_file_uploads</td><td class="v">20000</td><td class="v">20000</td></tr>
+
+Check the runtime verification passes for PHP 8.5
+    Runtime checks pass for PHP    8.5
 
 Login to sftpgo as user 9001 password 9001
     Put File    ${CURDIR}/test-sftpgo-login.sh    /tmp/test-sftpgo-login.sh
