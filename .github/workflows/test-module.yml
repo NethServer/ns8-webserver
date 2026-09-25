@@ -1,4 +1,6 @@
 name: Test module
+# The run belongs to the default branch under workflow_run: name the tested one.
+run-name: "Test ${{ github.event.workflow_run.head_branch || github.ref_name }} on QEMU"
 
 on:
   workflow_dispatch:
