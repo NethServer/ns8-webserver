@@ -2,6 +2,13 @@
 Library    SSHLibrary
 Resource    api.resource
 
+*** Variables ***
+# The CI passes install or update. UPDATE_FROM stays undefined on purpose: an
+# update run without it fails clearly instead of picking a baseline nobody chose.
+${SCENARIO}            install
+${CLUSTER_USER}        admin
+${CLUSTER_PASSWORD}    Nethesis,1234
+
 *** Keywords ***
 Retry test
     [Arguments]    ${keyword}
@@ -32,9 +39,27 @@ Runtime checks pass for PHP
     Should Be Equal As Integers    ${rc}  0
     Should Contain    ${output}    All runtime checks passed
 
+Login to cluster-admin
+    New Page    https://${NODE_ADDR}/cluster-admin/
+    Fill Text    text="Username"    ${CLUSTER_USER}
+    Click    button >> text="Continue"
+    Fill Text    text="Password"    ${CLUSTER_PASSWORD}
+    Click    button >> text="Log in"
+    Wait For Elements State    css=#main-content    visible    timeout=10s
+
+Screenshot page
+    [Arguments]    ${route}    ${title}    ${index}
+    Go To    https://${NODE_ADDR}/cluster-admin/#/apps/${module_id}${route}
+    Wait For Elements State    iframe >>> h2 >> text="${title}"    visible    timeout=10s
+    # The page fills itself from several tasks: let them land
+    Sleep    5s
+    Take Screenshot    filename=${OUTPUT DIR}/browser/screenshot/${index}._${title}.png
+
 *** Test Cases ***
 Check if webserver is installed correctly
-    ${output}  ${rc} =    Execute Command    add-module ${IMAGE_URL} 1
+    # The update scenario starts from the last release, then upgrades it below
+    ${image} =    Set Variable If    '${SCENARIO}' == 'update'    ${UPDATE_FROM}    ${IMAGE_URL}
+    ${output}  ${rc} =    Execute Command    add-module ${image} 1
     ...    return_rc=True
     Should Be Equal As Integers    ${rc}  0
     &{output} =    Evaluate    ${output}
@@ -62,6 +87,23 @@ Check if vhost 9001 can be updated
     ${rc} =    Execute Command    api-cli run module/${module_id}/update-vhost --data '{"PhpVersion":"","ServerNames":["foo.com","john.com"],"Port":9001,"MemoryLimit":1024,"AllowUrlfOpen":"enabled","UploadMaxFilesize":8,"PostMaxSize":16,"MaxExecutionTime":100,"MaxFileUploads":40,"lets_encrypt":false,"http2https": false,"Indexes":"enabled","status":"enabled"}'
     ...    return_rc=True  return_stdout=False
     Should Be Equal As Integers    ${rc}  0
+
+Update webserver to the image under test
+    Skip If    '${SCENARIO}' != 'update'    scenario is ${SCENARIO}, nothing to update
+    ${rc} =    Execute Command
+    ...    api-cli run update-module --data '{"force":true,"module_url":"${IMAGE_URL}","instances":["${module_id}"]}'
+    ...    return_rc=True  return_stdout=False
+    Should Be Equal As Integers    ${rc}  0
+
+Check if the configuration survives the update
+    Skip If    '${SCENARIO}' != 'update'    scenario is ${SCENARIO}, nothing to update
+    ${config} =    Run task    module/${module_id}/get-configuration    {}
+    Should Be Equal    ${config['path']}    /sftpgo
+    Should Be Equal As Integers    ${config['sftp_tcp_port']}    3092
+    ${vhost} =    Set Variable    ${config['vhosts'][0]}
+    Should Be Equal As Integers    ${vhost['Port']}    9001
+    Should Be Equal    ${vhost['ServerNames']}    ${{ ['foo.com', 'john.com'] }}
+    Should Be Equal As Integers    ${vhost['MemoryLimit']}    1024
 
 Retrieve virtualhost foo.com backend URL
     # Assuming the test is running on a single node cluster
@@ -261,6 +303,20 @@ Login to sftpgo as user admin password admin
     Should Be Equal As Integers    ${rc}  0
     should Be Empty    ${err}
     should Be Empty    ${out}
+
+Take screenshots of the module pages
+    [Documentation]    Capture what cluster-admin shows, with the vhost still listed.
+    ...                Tagged ui: skipped unless RUN_UI_TESTS is true, since it needs a browser.
+    [Tags]    ui
+    Import Library    Browser
+    New Browser    chromium    headless=True
+    New Context    ignoreHTTPSErrors=True    viewport={'width': 1280, 'height': 900}
+    Login to cluster-admin
+    Screenshot page    ${EMPTY}                   Status           1
+    Screenshot page    ?page=virtualhosts         Virtual hosts    2
+    Screenshot page    ?page=settings             Settings         3
+    Screenshot page    ?page=about                About            4
+    Close Browser
 
 Check if vhost can be destroyed
     ${rc} =    Execute Command    api-cli run module/${module_id}/destroy-vhost --data '{"ServerNames": ["foo.com","john.com"],"port": 9001}'
