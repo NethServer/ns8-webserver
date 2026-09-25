@@ -100,7 +100,7 @@ Check if the configuration survives the update
     ${config} =    Run task    module/${module_id}/get-configuration    {}
     Should Be Equal    ${config['path']}    /sftpgo
     Should Be Equal As Integers    ${config['sftp_tcp_port']}    3092
-    ${vhost} =    Set Variable    ${config['vhosts'][0]}
+    ${vhost} =    Set Variable    ${config['virtualhost'][0]}
     Should Be Equal As Integers    ${vhost['Port']}    9001
     Should Be Equal    ${vhost['ServerNames']}    ${{ ['foo.com', 'john.com'] }}
     Should Be Equal As Integers    ${vhost['MemoryLimit']}    1024
