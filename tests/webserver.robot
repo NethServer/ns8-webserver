@@ -86,6 +86,11 @@ Check if vhost 9001 can be updated
     ...    return_rc=True  return_stdout=False
     Should Be Equal As Integers    ${rc}  0
 
+Create a page in the 9001 vhost
+    ${rc} =    Execute Command    echo 'persisted-${module_id}' > /home/${module_id}/.local/share/containers/storage/volumes/websites/_data/9001/persist.html
+    ...    return_rc=True  return_stdout=False
+    Should Be Equal As Integers    ${rc}  0
+
 Update webserver to the image under test
     Skip If    '${SCENARIO}' != 'update'    scenario is ${SCENARIO}, nothing to update
     ${rc} =    Execute Command
@@ -118,6 +123,11 @@ Retrieve virtualhost john.com backend URL
 
 Check if virtualhost john.com works as expected
     Retry test    VirtualHost john.com URL is reachable
+
+Check the page of the 9001 vhost is still served
+    # Written before update-module: the update scenario checks the websites volume survives it
+    ${output} =    Execute Command    curl -s -H "Host: john.com" ${backend_url}/persist.html
+    Should Contain    ${output}    persisted-${module_id}
 
 Create a phpinfo to the 9001 vhost
     ${output}  ${rc} =    Execute Command    echo '<?php phpinfo();?>' > /home/${module_id}/.local/share/containers/storage/volumes/websites/_data/9001/phpinfo.php
