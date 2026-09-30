@@ -3,8 +3,6 @@ Library    SSHLibrary
 Resource    api.resource
 
 *** Variables ***
-# The CI passes install or update. UPDATE_FROM stays undefined on purpose: an
-# update run without it fails clearly instead of picking a baseline nobody chose.
 ${SCENARIO}            install
 ${CLUSTER_USER}        admin
 ${CLUSTER_PASSWORD}    Nethesis,1234
@@ -57,8 +55,8 @@ Screenshot page
 
 *** Test Cases ***
 Check if webserver is installed correctly
-    # The update scenario starts from the last release, then upgrades it below
-    ${image} =    Set Variable If    '${SCENARIO}' == 'update'    ${UPDATE_FROM}    ${IMAGE_URL}
+    # The update scenario starts from the NS8 stable release, then upgrades it below
+    ${image} =    Set Variable If    '${SCENARIO}' == 'update'    webserver    ${IMAGE_URL}
     ${output}  ${rc} =    Execute Command    add-module ${image} 1
     ...    return_rc=True
     Should Be Equal As Integers    ${rc}  0
