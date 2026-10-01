@@ -16,7 +16,7 @@ reponame="webserver"
 declare -a PHP_VERSIONS=(
     "8.5" "docker.io/library/php:8.5.11-fpm-bookworm"
     "8.4" "docker.io/library/php:8.4.26-fpm-bookworm"
-    "8.3" "docker.io/library/php:8.3.33-fpm-bookworm"
+    "8.3" "docker.io/library/php:8.3.35-fpm-bookworm"
     "8.2" "docker.io/library/php:8.2.34-fpm-bookworm"
     "8.1" "docker.io/library/php:8.1.34-fpm-bookworm"
     "8.0" "docker.io/library/php:8.0.30-fpm-bullseye"
