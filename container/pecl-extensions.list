@@ -1,7 +1,6 @@
-# Extensions built with pecl install, in build order, as name-version.
-# The version is pinned because the build downloads the tarball itself.
+# Extensions built with pecl install, in build order.
 # Every name here needs a check in verify-runtime.php, the build fails otherwise.
-imagick-3.8.1
-igbinary-3.2.17RC1
-apcu-5.1.28
-redis-6.3.0
+imagick
+igbinary
+apcu
+redis
