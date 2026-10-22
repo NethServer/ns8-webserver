@@ -142,7 +142,12 @@ RUN set -eux \
                     exit 11; \
                 }; \
         else \
-            pecl_install "$ext" \
+            pkg="$ext"; \
+            # pecl.php.net advertises igbinary 3.2.17RC1 as stable but serves no metadata for it
+            if [ "$ext" = "igbinary" ]; then \
+                pkg="igbinary-3.2.16"; \
+            fi; \
+            pecl_install "$pkg" \
                 || { \
                     echo "PECL $ext install failed"; \
                     exit 11; \
