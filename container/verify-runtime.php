@@ -118,7 +118,8 @@ function read_lists(): array
             exit(1);
         }
         foreach ($lines as $line) {
-            $name = trim(preg_replace('/#.*/', '', $line));
+            // pecl-extensions.list pins a version as name-version
+            $name = preg_replace('/-.*/', '', trim(preg_replace('/#.*/', '', $line)));
             if ($name !== '') {
                 $names[] = $name;
             }

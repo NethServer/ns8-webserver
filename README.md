@@ -411,7 +411,9 @@ SMTP_TLSVERIFY=
 The extensions of the PHP images are declared in two files, and nowhere else:
 
 - `container/php-extensions.list` — built with `docker-php-ext-install`
-- `container/pecl-extensions.list` — built with `pecl install`, in build order
+- `container/pecl-extensions.list` — built with `pecl install`, in build order, as
+  `name-version`. The build downloads the tarball from pecl.php.net itself, so a new release
+  is picked up only when its version is changed here.
 
 The build reads them to install the extensions and to check they are loaded.
 `container/verify-runtime.php`, shipped in the image, reads the same files.

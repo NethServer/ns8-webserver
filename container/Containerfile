@@ -47,7 +47,8 @@ COPY php-extensions.list pecl-extensions.list /usr/local/share/
 # verify-runtime.php and with the test suite
 RUN set -eux \
     && PHP_EXTENSIONS="$(sed -e 's/#.*//' /usr/local/share/php-extensions.list | xargs)" \
-    && PECL_EXTENSIONS="$(sed -e 's/#.*//' /usr/local/share/pecl-extensions.list | xargs)" \
+    && PECL_PACKAGES="$(sed -e 's/#.*//' /usr/local/share/pecl-extensions.list | xargs)" \
+    && PECL_EXTENSIONS="$(sed -e 's/#.*//' -e 's/-.*//' /usr/local/share/pecl-extensions.list | xargs)" \
     # Debian 11 is EOL: the bullseye-security index still lists packages that
     # were purged from the pool, so apt install dies on a 404.
     && if echo "$PHP_VERSION_IMAGE" | grep -q "bullseye$"; then \
@@ -108,14 +109,14 @@ RUN set -eux \
         docker-php-ext-install -j"$(nproc)" opcache; \
     fi \
     \
-    # pecl.php.net sometimes answers with an empty release list, retry before failing
+    # The pecl.php.net REST API keeps failing for the PEAR of PHP 7.4 to 8.1 in CI while
+    # plain downloads work, so fetch the tarball with curl and install it from disk
     && pecl_install() { \
-        for attempt in 1 2 3; do \
-            printf "\n" | pecl install "$@" && return 0; \
-            echo "pecl install $* failed, attempt $attempt/3"; \
-            sleep 30; \
-        done; \
-        return 1; \
+        pkg="$1"; \
+        shift; \
+        curl -fsSL --retry 5 --retry-delay 10 --retry-all-errors \
+            -o "/tmp/$pkg.tgz" "https://pecl.php.net/get/$pkg.tgz" \
+            && printf "\n" | pecl install "$@" "/tmp/$pkg.tgz"; \
     } \
     \
     # --- Handle IMAP depending on PHP version ---
@@ -123,7 +124,7 @@ RUN set -eux \
         docker-php-ext-configure imap --with-kerberos --with-imap-ssl; \
         docker-php-ext-install -j"$(nproc)" imap; \
     else \
-        pecl_install imap \
+        pecl_install imap-1.0.3 \
             || { \
                 echo 'PECL IMAP install failed'; \
                 exit 10; \
@@ -134,15 +135,16 @@ RUN set -eux \
     # --- Install the PECL extensions ---
     # PEAR needs the inner quotes of the redis option: without them it is
     # ignored on PHP 7.4 and crashes the builder on PHP 8.5
-    && for ext in $PECL_EXTENSIONS; do \
+    && for pkg in $PECL_PACKAGES; do \
+        ext="${pkg%%-*}"; \
         if [ "$ext" = "redis" ]; then \
-            pecl_install --configureoptions 'enable-redis-igbinary="yes"' redis \
+            pecl_install "$pkg" --configureoptions 'enable-redis-igbinary="yes"' \
                 || { \
                     echo 'PECL redis install failed'; \
                     exit 11; \
                 }; \
         else \
-            pecl_install "$ext" \
+            pecl_install "$pkg" \
                 || { \
                     echo "PECL $ext install failed"; \
                     exit 11; \
