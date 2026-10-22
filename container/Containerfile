@@ -142,14 +142,7 @@ RUN set -eux \
                     exit 11; \
                 }; \
         else \
-            pkg="$ext"; \
-            # pecl.php.net advertises igbinary 3.2.17RC1 as stable but serves no REST xml for it,
-            # the older PEAR of the unmaintained PHP 7.4 to 8.1 images fails on that, 8.2+ install it fine
-            if [ "$ext" = "igbinary" ] \
-                && php -r 'exit(version_compare(PHP_VERSION,"8.2.0","<")?0:1);'; then \
-                pkg="igbinary-3.2.16"; \
-            fi; \
-            pecl_install "$pkg" \
+            pecl_install "$ext" \
                 || { \
                     echo "PECL $ext install failed"; \
                     exit 11; \
