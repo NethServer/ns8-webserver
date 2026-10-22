@@ -108,13 +108,22 @@ RUN set -eux \
         docker-php-ext-install -j"$(nproc)" opcache; \
     fi \
     \
+    # pecl.php.net sometimes answers with an empty release list, retry before failing
+    && pecl_install() { \
+        for attempt in 1 2 3; do \
+            printf "\n" | pecl install "$@" && return 0; \
+            echo "pecl install $* failed, attempt $attempt/3"; \
+            sleep 10; \
+        done; \
+        return 1; \
+    } \
+    \
     # --- Handle IMAP depending on PHP version ---
     && if php -r 'exit(version_compare(PHP_VERSION,"8.4.0","<")?0:1);'; then \
         docker-php-ext-configure imap --with-kerberos --with-imap-ssl; \
         docker-php-ext-install -j"$(nproc)" imap; \
     else \
-        printf "\n" \
-            | pecl install imap \
+        pecl_install imap \
             || { \
                 echo 'PECL IMAP install failed'; \
                 exit 10; \
@@ -127,13 +136,13 @@ RUN set -eux \
     # ignored on PHP 7.4 and crashes the builder on PHP 8.5
     && for ext in $PECL_EXTENSIONS; do \
         if [ "$ext" = "redis" ]; then \
-            pecl install --configureoptions 'enable-redis-igbinary="yes"' redis \
+            pecl_install --configureoptions 'enable-redis-igbinary="yes"' redis \
                 || { \
                     echo 'PECL redis install failed'; \
                     exit 11; \
                 }; \
         else \
-            pecl install "$ext" \
+            pecl_install "$ext" \
                 || { \
                     echo "PECL $ext install failed"; \
                     exit 11; \
