@@ -113,6 +113,11 @@ RUN set -eux \
         for attempt in 1 2 3; do \
             printf "\n" | pecl install "$@" && return 0; \
             echo "pecl install $* failed, attempt $attempt/3"; \
+            # Temporary, to check whether pecl.php.net rate limits the CI runner
+            for pkg; do :; done; \
+            curl -sS -o /dev/null -D - -w 'HTTP status %{http_code}\n' \
+                "https://pecl.php.net/rest/p/${pkg%%-*}/info.xml" \
+                | grep -iE '^(HTTP|retry-after|server|x-ratelimit|cf-)' || true; \
             sleep 30; \
         done; \
         return 1; \
