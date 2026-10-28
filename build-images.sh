@@ -101,7 +101,7 @@ echo "Starting UI build with Node..."
         # Reuse existing nodebuilder-webserver container, to speed up builds
         if ! buildah containers --format "{{.ContainerName}}" | grep -qx nodebuilder-webserver; then
             echo "[node] Pulling NodeJS runtime..."
-            buildah from --name nodebuilder-webserver -v "${PWD}:/usr/src:Z" docker.io/library/node:24-slim
+            buildah from --name nodebuilder-webserver -v "${PWD}:/usr/src:Z" docker.io/library/node:26-slim
         fi
         buildah run --env="NODE_OPTIONS=--openssl-legacy-provider" nodebuilder-webserver \
             sh -c "cd /usr/src/ui && corepack enable && yarn install && yarn build" 2>&1 | sed -u "s/^/[node] /"
