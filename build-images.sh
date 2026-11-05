@@ -98,13 +98,18 @@ echo "Starting UI build with Node..."
     set +e
     (
         set +e
+        # Node.js 25+ no longer ships Corepack, install it from npm
+        # renovate: datasource=npm packageName=corepack
+        corepack_version=0.36.0
+
         # Reuse existing nodebuilder-webserver container, to speed up builds
         if ! buildah containers --format "{{.ContainerName}}" | grep -qx nodebuilder-webserver; then
             echo "[node] Pulling NodeJS runtime..."
-            buildah from --name nodebuilder-webserver -v "${PWD}:/usr/src:Z" docker.io/library/node:24-slim
+            buildah from --name nodebuilder-webserver -v "${PWD}:/usr/src:Z" docker.io/library/node:24.22.2-slim
+            buildah run nodebuilder-webserver sh -c "npm install -g corepack@${corepack_version} && corepack enable"
         fi
         buildah run --env="NODE_OPTIONS=--openssl-legacy-provider" nodebuilder-webserver \
-            sh -c "cd /usr/src/ui && corepack enable && yarn install && yarn build" 2>&1 | sed -u "s/^/[node] /"
+            sh -c "cd /usr/src/ui && yarn install && yarn build" 2>&1 | sed -u "s/^/[node] /"
         exit "${PIPESTATUS[0]}"
     ) &
     build_pid=$!
