@@ -105,7 +105,7 @@ echo "Starting UI build with Node..."
         # Reuse existing nodebuilder-webserver container, to speed up builds
         if ! buildah containers --format "{{.ContainerName}}" | grep -qx nodebuilder-webserver; then
             echo "[node] Pulling NodeJS runtime..."
-            buildah from --name nodebuilder-webserver -v "${PWD}:/usr/src:Z" docker.io/library/node:26.12.1-slim
+            buildah from --name nodebuilder-webserver -v "${PWD}:/usr/src:Z" docker.io/library/node:26.13.0-slim
             buildah run nodebuilder-webserver sh -c "npm install -g corepack@${corepack_version} && corepack enable"
         fi
         buildah run --env="NODE_OPTIONS=--openssl-legacy-provider" nodebuilder-webserver \
