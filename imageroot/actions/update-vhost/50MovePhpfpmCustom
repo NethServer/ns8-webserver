@@ -28,6 +28,10 @@ data = json.load(sys.stdin)
 port = data.get('Port')
 PhpVersion = data.get("PhpVersion")
 
+# a static site has no php-fpm folder, the custom file stays where it is
+if not PhpVersion:
+    sys.exit(0)
+
 #Remove php-fpm customisation, we need to be sure the container has created the php-fpm folder
 files = glob.glob("php*-fpm-custom.d/dyn-"+str(port)+".custom")
 for file in files:
