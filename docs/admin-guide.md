@@ -215,6 +215,11 @@ overwrites them, and backs them up.
 
 The php-fpm file lives in the folder of the PHP version of the site.
 
+The pool includes its custom file before the values set in the UI. A
+custom `memory_limit`, `upload_max_filesize`, `post_max_size`,
+`max_execution_time`, `max_input_time`, `max_file_uploads` or
+`allow_url_fopen` is ignored. Change them in the virtual host settings.
+
 Edit them as the module user, then reload the service:
 
 ```sh
