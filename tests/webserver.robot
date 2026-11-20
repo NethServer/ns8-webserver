@@ -275,6 +275,11 @@ Check if phpinfo.php uses PHP 8.4 with the custom settings
 Check the runtime verification passes for PHP 8.4
     Runtime checks pass for PHP    8.4
 
+Add a php-fpm custom setting to the 9001 vhost
+    ${rc} =    Execute Command    runagent -m ${module_id} sh -c 'echo "env[TEST_VAR] = moved" >> /home/${module_id}/.config/state/php8.4-fpm-custom.d/dyn-9001.custom'
+    ...    return_rc=True  return_stdout=False
+    Should Be Equal As Integers    ${rc}  0
+
 Check if vhost 9001 can use PHP85
     ${rc} =    Execute Command    api-cli run module/${module_id}/update-vhost --data '{"PhpVersion":"8.5","ServerNames":["foo.com","john.com"],"Port":9001,"MemoryLimit":2000,"AllowUrlfOpen":"enabled","UploadMaxFilesize":2000,"PostMaxSize":2000,"MaxExecutionTime":3600,"MaxFileUploads":20000,"lets_encrypt":true,"http2https":true,"Indexes":"enabled","status":"enabled"}'
     ...    return_rc=True  return_stdout=False
@@ -295,6 +300,33 @@ Check if phpinfo.php uses PHP 8.5 with the custom settings
 
 Check the runtime verification passes for PHP 8.5
     Runtime checks pass for PHP    8.5
+
+Check the php-fpm custom file follows the vhost to PHP 8.5
+    ${rc} =    Execute Command    test ! -e /home/${module_id}/.config/state/php8.4-fpm-custom.d/dyn-9001.custom && grep -qF 'env[TEST_VAR] = moved' /home/${module_id}/.config/state/php8.5-fpm-custom.d/dyn-9001.custom
+    ...    return_rc=True  return_stdout=False
+    Should Be Equal As Integers    ${rc}  0
+
+Check if vhost 9001 can go back to a static site
+    ${rc} =    Execute Command    api-cli run module/${module_id}/update-vhost --data '{"PhpVersion":"","ServerNames":["foo.com","john.com"],"Port":9001,"MemoryLimit":2000,"AllowUrlfOpen":"enabled","UploadMaxFilesize":2000,"PostMaxSize":2000,"MaxExecutionTime":3600,"MaxFileUploads":20000,"lets_encrypt":true,"http2https":true,"Indexes":"enabled","status":"enabled"}'
+    ...    return_rc=True  return_stdout=False
+    Should Be Equal As Integers    ${rc}  0
+    Retry test    VirtualHost john.com URL is reachable
+
+Check the php-fpm custom file stays in place for a static site
+    ${rc} =    Execute Command    grep -qF 'env[TEST_VAR] = moved' /home/${module_id}/.config/state/php8.5-fpm-custom.d/dyn-9001.custom
+    ...    return_rc=True  return_stdout=False
+    Should Be Equal As Integers    ${rc}  0
+
+Check if vhost 9001 can go back to PHP 8.4
+    ${rc} =    Execute Command    api-cli run module/${module_id}/update-vhost --data '{"PhpVersion":"8.4","ServerNames":["foo.com","john.com"],"Port":9001,"MemoryLimit":2000,"AllowUrlfOpen":"enabled","UploadMaxFilesize":2000,"PostMaxSize":2000,"MaxExecutionTime":3600,"MaxFileUploads":20000,"lets_encrypt":true,"http2https":true,"Indexes":"enabled","status":"enabled"}'
+    ...    return_rc=True  return_stdout=False
+    Should Be Equal As Integers    ${rc}  0
+    Retry test    VirtualHost john.com URL is reachable
+
+Check the php-fpm custom file follows the vhost back to PHP 8.4
+    ${rc} =    Execute Command    test ! -e /home/${module_id}/.config/state/php8.5-fpm-custom.d/dyn-9001.custom && grep -qF 'env[TEST_VAR] = moved' /home/${module_id}/.config/state/php8.4-fpm-custom.d/dyn-9001.custom
+    ...    return_rc=True  return_stdout=False
+    Should Be Equal As Integers    ${rc}  0
 
 Login to sftpgo as user 9001 password 9001
     Put File    ${CURDIR}/test-sftpgo-login.sh    /tmp/test-sftpgo-login.sh
