@@ -22,27 +22,14 @@ import os
 import json
 import sys
 import glob
-import subprocess
 
 data = json.load(sys.stdin)
 
 port = data.get('Port')
 PhpVersion = data.get("PhpVersion")
 
-# A static site has no php-fpm folder to move the file to, keep it where it is
-if not PhpVersion:
-    sys.exit(0)
-
-#Remove php-fpm customisation, we need to be sure the container has created the php-fpm folder
-target = "php"+str(PhpVersion)+"-fpm-custom.d/dyn-"+str(port)+".custom"
-files = glob.glob("php*-fpm-custom.d/dyn-"+str(port)+".custom")
-moved = False
-for file in files:
-    if file != target:
-        # replaces the empty file that expand-vhosts created in the new folder
-        os.rename(file, target)
-        moved = True
-
-# the pool was reloaded by an earlier step, before the custom file was in place
-if moved:
-    subprocess.run(["systemctl", "--user", "reload", "phpfpm@"+str(PhpVersion)+".service"])
+# a static site has no php-fpm folder, its custom file stays where it is
+if PhpVersion:
+    os.makedirs(f"php{PhpVersion}-fpm-custom.d", exist_ok=True)
+    for file in glob.glob(f"php*-fpm-custom.d/dyn-{port}.custom"):
+        os.rename(file, f"php{PhpVersion}-fpm-custom.d/dyn-{port}.custom")
