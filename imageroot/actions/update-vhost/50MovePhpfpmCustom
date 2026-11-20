@@ -25,7 +25,7 @@ import glob
 
 data = json.load(sys.stdin)
 
-port = data.get('port')
+port = data.get('Port')
 PhpVersion = data.get("PhpVersion")
 
 #Remove php-fpm customisation, we need to be sure the container has created the php-fpm folder
